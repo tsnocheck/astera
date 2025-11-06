@@ -1,0 +1,31 @@
+import { IPrecondition } from '@lolz-bots/shared';
+import {
+  BaseInteraction,
+  GuildMemberRoleManager,
+  MessageFlags,
+} from 'discord.js';
+
+export default class AminsOnly implements IPrecondition {
+  name = 'admins-only';
+
+  async run({ interaction }: { interaction: BaseInteraction }) {
+    if (!interaction.isChatInputCommand()) {
+      return false;
+    }
+
+    const member = interaction.member;
+    if (!member) return false;
+    const roles = member.roles as GuildMemberRoleManager;
+    const adminRoles = process.env.ADMIN_ROLE_IDS?.split(',') || [];
+    if (roles.cache.some((r) => adminRoles.includes(r.id))) {
+      return true;
+    }
+    if (interaction.isRepliable()) {
+      await interaction.reply({
+        content: 'You do not have permission to use this command.',
+        flags: [MessageFlags.Ephemeral],
+      });
+    }
+    return false;
+  }
+}
