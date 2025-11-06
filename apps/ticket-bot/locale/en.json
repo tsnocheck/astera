@@ -1,0 +1,32 @@
+{
+  "ticket": {
+    "create": {
+      "title": "Create Ticket",
+      "description": "Description",
+      "topic": "Topic"
+    },
+    "close": {
+      "confirm": "Are you sure you want to close the ticket?",
+      "closedBy": "Ticket was closed by <@%id%>"
+    },
+    "embed": {
+      "title": "Topic %topic%",
+      "number": "Ticket %number%",
+      "profile": "Profile on LZT",
+      "description": "Description \n%description%",
+      "created": "Ticket Created",
+      "created_description": "Your ticket has been created. \n[Go to ticket](%link%)",
+      "closed": "Thank you for contacting us",
+      "closed_description": "The ticket will be closed in a minute.",
+      "cancelled": "Cancelled",
+      "cancelled_description": "Ticket closure has been cancelled.",
+      "timeout": "Time is out",
+      "timeout_description": "You didn't manage to answer the confirmation. To close it, press the button"
+    },
+    "buttons": {
+      "close": "Close Ticket",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    }
+  }
+}

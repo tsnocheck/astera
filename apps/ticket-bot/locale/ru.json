@@ -1,0 +1,32 @@
+{
+  "ticket": {
+    "create": {
+      "title": "Создать заявку",
+      "description": "Описание",
+      "topic": "Тема"
+    },
+    "close": {
+      "confirm": "Вы уверены, что хотите закрыть тикет?",
+      "closedBy": "Тикет был закрыт пользователем <@%id%>"
+    },
+    "embed": {
+      "title": "Тема %topic%",
+      "number": "Тикет %number%",
+      "profile": "Профиль на LZT",
+      "description": "Описание \n%description%",
+      "created": "Тикет создан",
+      "created_description": "Ваш тикет был создан. \n[Перейти в тикет](%link%)",
+      "closed": "Спасибо за обращение",
+      "closed_description": "Тикет будет закрыт через минуту.",
+      "cancelled": "Отмена",
+      "cancelled_description": "Закрытие тикета былр отменено.",
+      "timeout": "Время вышло",
+      "timeout_description": "Вы не успели ответить на подтверждение. Для закрытия повторно нажмите на кнопку"
+    },
+    "buttons": {
+      "close": "Закрыть тикет",
+      "confirm": "Подтвердить",
+      "cancel": "Отмена"
+    }
+  }
+}

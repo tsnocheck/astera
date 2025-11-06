@@ -1,0 +1,92 @@
+services:
+  ticket-bot:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: apps/ticket-bot/Dockerfile
+    env_file:
+      - .env.ticket
+    networks:
+      - bridge
+    depends_on:
+      - mongo
+      - broker
+  moderation-bot:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: apps/moderation-bot/Dockerfile
+    env_file:
+      - .env.moderation
+    networks:
+      - bridge
+    depends_on:
+      - mongo
+      - broker
+  economy-bot:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: apps/economy-bot/Dockerfile
+    env_file:
+      - .env.economy
+    networks:
+      - bridge
+    depends_on:
+      - mongo
+      - broker
+  api:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    env_file:
+      - .env.api
+    networks:
+      - bridge
+    depends_on:
+      - mongo
+      - broker
+    ports:
+      - ${PORT}:${PORT}
+  broker:
+    image: apache/kafka:latest
+    ports:
+      - "9092:9092"
+    expose:
+      - 9092
+    networks:
+      - bridge
+    environment:
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_LISTENERS: CONTROLLER://localhost:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,DOCKER://broker:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,DOCKER:PLAINTEXT,HOST:PLAINTEXT
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9091
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  mongo:
+    image: mongo:latest
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+      - ./data/db:/data/db
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    networks:
+      - bridge
+    env_file:
+      - .env.mongo
+
+
+volumes:
+  mongo-data:
+    driver: local
+
+networks:
+  bridge:
