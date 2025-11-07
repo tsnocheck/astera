@@ -6,14 +6,13 @@ import {
 } from '@typegoose/typegoose';
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 import { Types } from 'mongoose';
-import { Item, ItemModel } from './Item';
-import { User } from 'discord.js';
-
-@modelOptions({ schemaOptions: { _id: false } })
 
 export class RoomUser extends TimeStamps implements Base {
   public _id!: Types.ObjectId;
   public id!: string;
+
+  @Prop({ default: false })
+  public muted?: boolean;
 
   @Prop({ required: true })
   public roomId!: Types.ObjectId;
@@ -33,7 +32,7 @@ export class Room extends TimeStamps implements Base {
   public _id!: Types.ObjectId;
   public id!: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   public name!: string;
 
   @Prop()

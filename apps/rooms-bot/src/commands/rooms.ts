@@ -19,7 +19,7 @@ import {
   ApplicationCommandOptionType,
   ButtonStyle,
 } from 'discord-api-types/v10';
-import { Room, RoomModel, RoomUserModel } from '@lolz-bots/shared/lib/models/Room';
+import { Room, RoomModel, RoomUserModel } from '@lolz-bots/shared';
 
 export default class CreateRooms implements ICommand {
   name = 'create-rooms';
@@ -49,16 +49,21 @@ export default class CreateRooms implements ICommand {
       ownerId: user.id,
     });
 
+    await room.save();
+
     const roomUser = new RoomUserModel({
       roomId: room._id,
       userId: user.id,
-    })
+    });
 
+    await roomUser.save();
+
+    room.users.push(roomUser._id);
     await room.save();
+
     await interaction.reply({
       content: `Room "${name}" created successfully for ${user.username}.`,
       ephemeral: true,
     });
   }
 }
-

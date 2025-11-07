@@ -1,24 +1,22 @@
-import {
-  IFeature,
-  RunFeatureParams,
-} from '@lolz-bots/shared';
+import { constructEmbed, IFeature, RoomUser, RunFeatureParams } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
   ButtonInteraction,
   StringSelectMenuBuilder,
+  UserSelectMenuBuilder,
 } from 'discord.js';
-import {
-  RoomModel,
-  RoomUserModel,
-} from '@lolz-bots/shared/lib/models/Room';
+import { RoomModel, RoomUserModel } from '@lolz-bots/shared';
 
-export class CreateRoom implements IFeature<ButtonInteraction> {
-  name = 'createRoom';
+export class SetLimits implements IFeature<ButtonInteraction> {
+  name = 'setLimits';
 
   async run({ interaction }: RunFeatureParams<ButtonInteraction>) {
-    const userRooms = await RoomUserModel.find({ userId: interaction.user.id });
+    const userRooms = await RoomUserModel.find({
+      ownerId: interaction.user.id,
+    });
+    const coOwners = await RoomModel.find({ coOwners: interaction.user.id });
 
-    if (userRooms.length === 0) {
+    if (userRooms.length === 0 || coOwners.length === 0) {
       await interaction.reply({
         content: 'You do not have a room to create.',
         ephemeral: true,
@@ -26,8 +24,10 @@ export class CreateRoom implements IFeature<ButtonInteraction> {
       return;
     }
 
-    const roomIds = userRooms.map((ur) => ur.roomId);
-    const rooms = await RoomModel.find({ _id: { $in: roomIds } });
+    const roomIds = userRooms.map((ur: RoomUser) => ur.roomId);
+    const coOwnerRoomIds = coOwners.map((room) => room._id);
+    const allRoomIds = [...roomIds, ...coOwnerRoomIds];
+    const rooms = await RoomModel.find({ _id: { $in: allRoomIds } });
 
     if (rooms.length === 0) {
       await interaction.reply({
@@ -46,16 +46,16 @@ export class CreateRoom implements IFeature<ButtonInteraction> {
       new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
         new StringSelectMenuBuilder()
           .setCustomId('selectRoom')
-          .setPlaceholder('Выберите комнату:')
+          .setPlaceholder('Select room:')
           .addOptions(options),
       );
 
     await interaction.reply({
-      content: 'Выберите комнату:',
+      content: 'Select room:',
       components: [action],
       ephemeral: true,
     });
   }
 }
 
-export default CreateRoom;
+export default SetLimits;

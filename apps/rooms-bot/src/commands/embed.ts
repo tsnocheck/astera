@@ -1,20 +1,12 @@
-import {
-  constructEmbed,
-  ICommand,
-  RunCommandParams,
-} from '@lolz-bots/shared';
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-} from 'discord.js';
-import CreateRoom from '../features/buttons/createRoom.button';
+import { constructEmbed, ICommand, RunCommandParams } from '@lolz-bots/shared';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import CreateRoom from '../features/buttons/CreateRoom.button';
 
 export default class CreateRooms implements ICommand {
   name = 'create-embed';
   description = 'Send embeds with buttons';
   preconditions = ['admins-only'];
-  
+
   features = [new CreateRoom()];
 
   async run({ interaction }: RunCommandParams) {
@@ -66,5 +58,10 @@ export default class CreateRooms implements ICommand {
     });
 
     await channel.send({ embeds: [embed], components: [buttons, button2] });
+
+    await interaction.reply({
+      content: 'Embed with buttons sent successfully.',
+      ephemeral: true,
+    });
   }
 }

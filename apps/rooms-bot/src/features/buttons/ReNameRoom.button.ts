@@ -1,13 +1,13 @@
-import { IFeature, RunFeatureParams } from '@lolz-bots/shared';
+import { IFeature, Room, RoomUser, RunFeatureParams } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
   ButtonInteraction,
   StringSelectMenuBuilder,
 } from 'discord.js';
-import { RoomModel, RoomUserModel, RoomUser } from '@lolz-bots/shared';
+import { RoomModel, RoomUserModel } from '@lolz-bots/shared';
 
-export class CreateRoom implements IFeature<ButtonInteraction> {
-  name = 'createRoom';
+export class ReNameRoom implements IFeature<ButtonInteraction> {
+  name = 'reName';
 
   async run({ interaction }: RunFeatureParams<ButtonInteraction>) {
     const userRooms = await RoomUserModel.find({
@@ -57,4 +57,4 @@ export class CreateRoom implements IFeature<ButtonInteraction> {
   }
 }
 
-export default CreateRoom;
+export default ReNameRoom;
