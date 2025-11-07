@@ -6,15 +6,15 @@ RUN corepack enable
 
 COPY package.json yarn.lock ./
 
-RUN mkdir -p libs/shared && mkdir -p apps/economy-bot
+RUN mkdir -p libs/shared && mkdir -p apps/rooms-bot
 COPY libs/shared/package.json ./libs/shared/
-COPY apps/economy-bot/package.json ./apps/economy-bot/
+COPY apps/rooms-bot/package.json ./apps/rooms-bot/
 
 RUN yarn install
 
 COPY . .
 
-RUN yarn workspace economy-bot build
+RUN yarn workspace rooms-bot build
 
 FROM node:23-slim AS runner
 
@@ -24,12 +24,12 @@ RUN corepack enable
 
 COPY package.json yarn.lock ./
 
-RUN mkdir -p libs/shared && mkdir -p apps/economy-bot
+RUN mkdir -p libs/shared && mkdir -p apps/rooms-bot
 COPY libs/shared/package.json ./libs/shared/
-COPY apps/economy-bot/package.json ./apps/economy-bot/
+COPY apps/rooms-bot/package.json ./apps/rooms-bot/
 
 RUN yarn workspaces focus --all --production
-COPY --from=builder /app/apps/economy-bot/dist ./apps/economy-bot/dist
+COPY --from=builder /app/apps/rooms-bot/dist ./apps/rooms-bot/dist
 COPY --from=builder /app/libs/shared/dist ./libs/shared/dist
 
-CMD ["yarn", "workspace", "economy-bot", "start"]
+CMD ["yarn", "workspace", "rooms-bot", "start"]

@@ -1,5 +1,5 @@
 {
-  "name": "economy-bot",
+  "name": "rooms-bot",
   "packageManager": "yarn@4.9.1",
   "dependencies": {
     "@lolz-bots/shared": "1.0.0",
