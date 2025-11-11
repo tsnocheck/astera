@@ -13,27 +13,34 @@ export default class CreateRooms implements ICommand {
     const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('inviteRoom')
-        .setEmoji('<:images1:1435679609776771072>')
+        .setLabel('Пригласить')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('muteOrUnMute')
-        .setEmoji('<:images1:1435679609776771072>')
+        .setLabel('Заглушить')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('addCoOwner')
-        .setEmoji('<:images1:1435679609776771072>')
+        .setLabel('Добавить со-владельца')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('setLimits')
-        .setEmoji('<:images1:1435679609776771072>')
+        .setLabel('Установить лимиты')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('reName')
-        .setEmoji('<:images1:1435679609776771072>')
+        .setLabel('Переименовать')
         .setStyle(ButtonStyle.Secondary),
     );
 
     let button2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId('onlineStats')
+        .setLabel('ㅤㅤㅤㅤㅤㅤㅤОнлайн комнатыㅤㅤㅤㅤㅤㅤㅤ')
+        .setStyle(ButtonStyle.Secondary),
+    );
+
+    let button3 = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('createRoom')
         .setLabel('ㅤㅤㅤㅤㅤㅤㅤㅤㅤСоздатьㅤㅤㅤㅤㅤㅤㅤㅤㅤ')
@@ -57,7 +64,10 @@ export default class CreateRooms implements ICommand {
       customType: 'info',
     });
 
-    await channel.send({ embeds: [embed], components: [buttons, button2] });
+    await channel.send({
+      embeds: [embed],
+      components: [buttons, button2, button3],
+    });
 
     await interaction.reply({
       content: 'Embed with buttons sent successfully.',

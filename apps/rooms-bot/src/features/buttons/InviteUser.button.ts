@@ -1,4 +1,4 @@
-import { constructEmbed, IFeature, RunFeatureParams } from '@lolz-bots/shared';
+import { constructEmbed, IFeature, logger, RunFeatureParams } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
   ButtonInteraction,
@@ -11,9 +11,10 @@ export class InviteRoom implements IFeature<ButtonInteraction> {
   name = 'inviteRoom';
 
   async run({ interaction }: RunFeatureParams<ButtonInteraction>) {
-    const room = await RoomModel.findOne({ ownerId: interaction.user.id });
+    const ownerRoom = await RoomModel.find({ ownerId: interaction.user.id });
+    const coOwners = await RoomModel.find({ coOwners: interaction.user.id });
 
-    if (!room) {
+    if (!ownerRoom && coOwners.length === 0) {
       await interaction.reply({
         content: 'You do not own any rooms to add a co-owner.',
         ephemeral: true,
@@ -21,23 +22,36 @@ export class InviteRoom implements IFeature<ButtonInteraction> {
       return;
     }
 
-    const user = new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(
-      new UserSelectMenuBuilder()
-        .setCustomId('selectMuteOrUnmute')
-        .setPlaceholder('Select users to mute or unmute')
-        .setMinValues(1)
-        .setMaxValues(5),
-    );
+    const сoOwnerRoomIds = coOwners.map((room) => room._id);
+    const ownerRoomIds = ownerRoom.map((room) => room._id);
+    const roomIds = [...сoOwnerRoomIds, ...ownerRoomIds];
 
-    const embed = constructEmbed({
-      title: 'Room Management',
-      description: 'Select users to mute or unmute in your room.',
-      customType: 'info',
-    });
+    const rooms = await RoomModel.find({ _id: { $in: roomIds } });
+
+    if (rooms.length === 0) {
+      await interaction.reply({
+        content: 'Rooms not found.',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    const options = rooms.map((room) => ({
+      value: room._id.toString(),
+      label: room.name,
+    }));
+
+    const action =
+      new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+        new StringSelectMenuBuilder()
+          .setCustomId(`selectInviteRoom`)
+          .setPlaceholder('Select room:')
+          .addOptions(options),
+      );
 
     await interaction.reply({
-      embeds: [embed],
-      components: [user],
+      content: 'Select room:',
+      components: [action],
       ephemeral: true,
     });
   }

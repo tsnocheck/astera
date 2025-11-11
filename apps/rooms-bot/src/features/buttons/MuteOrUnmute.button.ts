@@ -11,7 +11,7 @@ export class MuteOrUnmute implements IFeature<ButtonInteraction> {
   name = 'muteOrUnMute';
 
   async run({ interaction }: RunFeatureParams<ButtonInteraction>) {
-    const room = await RoomModel.findOne({ ownerId: interaction.user.id });
+    const room = await RoomModel.find({ ownerId: interaction.user.id });
 
     if (!room) {
       await interaction.reply({
@@ -21,12 +21,16 @@ export class MuteOrUnmute implements IFeature<ButtonInteraction> {
       return;
     }
 
-    const user = new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(
-      new UserSelectMenuBuilder()
-        .setCustomId('selectMuteOrUnmute')
-        .setPlaceholder('Select users to mute or unmute')
-        .setMinValues(1)
-        .setMaxValues(5),
+    const options = room.map((room) => ({
+      value: room._id.toString(),
+      label: room.name,
+    }));
+
+    const select = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId(`selectMuteOrUnMuteRoom`)
+        .setPlaceholder('Select room:')
+        .addOptions(options),
     );
 
     const embed = constructEmbed({
@@ -37,7 +41,7 @@ export class MuteOrUnmute implements IFeature<ButtonInteraction> {
 
     await interaction.reply({
       embeds: [embed],
-      components: [user],
+      components: [select],
       ephemeral: true,
     });
   }

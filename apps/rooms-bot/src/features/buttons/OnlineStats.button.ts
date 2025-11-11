@@ -1,16 +1,25 @@
-import { IFeature, logger, RoomUserModel, RunFeatureParams } from '@lolz-bots/shared';
+import { constructEmbed, IFeature, logger, RoomUser, RunFeatureParams } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
   ButtonInteraction,
   StringSelectMenuBuilder,
+  UserSelectMenuBuilder,
 } from 'discord.js';
-import { RoomModel, RoomUser, } from '@lolz-bots/shared';
+import { RoomModel, RoomUserModel } from '@lolz-bots/shared';
 
-export class CreateRoom implements IFeature<ButtonInteraction> {
-  name = 'createRoom';
+export class OnlineStats implements IFeature<ButtonInteraction> {
+  name = 'onlineStats';
 
   async run({ interaction }: RunFeatureParams<ButtonInteraction>) {
     const userRooms = await RoomUserModel.find({ userId: interaction.user.id });
+
+    if (!userRooms) {
+      return interaction.reply({
+        content: 'You do not have are rooms.',
+        ephemeral: true,
+        components: [],
+      });
+    }
 
     const roomIds = userRooms.map((ur: RoomUser) => ur.roomId);
     const rooms = await RoomModel.find({ _id: { $in: roomIds } });
@@ -31,7 +40,7 @@ export class CreateRoom implements IFeature<ButtonInteraction> {
     const action =
       new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
         new StringSelectMenuBuilder()
-          .setCustomId('selectRoom')
+          .setCustomId('selectOnlineStatsRoom')
           .setPlaceholder('Select room:')
           .addOptions(options),
       );
@@ -44,4 +53,4 @@ export class CreateRoom implements IFeature<ButtonInteraction> {
   }
 }
 
-export default CreateRoom;
+export default OnlineStats;

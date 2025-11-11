@@ -38,11 +38,46 @@ export default class CreateRooms implements ICommand {
       type: ApplicationCommandOptionType.String,
       required: true,
     },
+    {
+      name: 'cost',
+      description: 'Cost of the room',
+      type: ApplicationCommandOptionType.Number,
+      required: true,
+    },
   ];
 
   async run({ interaction }: RunCommandParams) {
     const user = interaction.options.getUser('member') || interaction.user;
     const name = interaction.options.getString('name', true);
+    const cost = interaction.options.getNumber('cost', true);
+
+    let userData = await UserModel.findOne({ discordID: user.id });
+
+    if (!userData) {
+      userData = await UserModel.create({ discordID: user.id, coins: 0 });
+    }
+
+    const ownerRoom = await RoomModel.findOne({ ownerId: user.id });
+
+    if (ownerRoom) {
+      await interaction.reply({
+        content: `${user.username} already owns a room.`,
+        ephemeral: true,
+      });
+      return;
+    }
+
+    if (userData.coins < cost) {
+      await interaction.reply({
+        content: `${user.username} does not have enough balance to create a room.`,
+        ephemeral: true,
+      });
+      return;
+    }
+
+    userData.coins -= cost;
+    await userData.save();
+
 
     const room = new RoomModel({
       name: name,

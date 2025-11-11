@@ -11,7 +11,7 @@ export class AddCoOwner implements IFeature<ButtonInteraction> {
   name = 'addCoOwner';
 
   async run({ interaction }: RunFeatureParams<ButtonInteraction>) {
-    const room = await RoomModel.findOne({ ownerId: interaction.user.id });
+    const room = await RoomModel.find({ ownerId: interaction.user.id });
 
     if (!room) {
       await interaction.reply({
@@ -21,24 +21,28 @@ export class AddCoOwner implements IFeature<ButtonInteraction> {
       return;
     }
 
-    const user = new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(
-      new UserSelectMenuBuilder()
-        .setCustomId('selectCoOwner')
-        .setPlaceholder('Select co-owners to add')
-        .setMinValues(1)
-        .setMaxValues(3),
-    )
+    const options = room.map((room) => ({
+      value: room._id.toString(),
+      label: room.name,
+    }));
+
+    const select = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId(`selectCoOwner`)
+        .setPlaceholder('Select room:')
+        .addOptions(options),
+    );
 
     const embed = constructEmbed({
       title: 'Room Management',
       description:
-          'Select co-owners to add to your room.',
+          'Select room to add co-owner.',
       customType: 'info',
     });
     
     await interaction.reply({
       embeds: [embed],
-      components: [user],
+      components: [select],
       ephemeral: true,
     });
   }

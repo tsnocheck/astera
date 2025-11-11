@@ -1,4 +1,4 @@
-import { IFeature, RunFeatureParams } from '@lolz-bots/shared';
+import { IFeature, logger, RunFeatureParams } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
   Base,
@@ -42,7 +42,7 @@ export class SelectRoom implements IFeature<SelectMenuInteraction> {
     permissionOverwrites.push({
       id: process.env.DEV_GUILD_ID!,
       allow: [PermissionFlagsBits.ViewChannel],
-      deny: [],
+      deny: [PermissionFlagsBits.Connect],
     });
 
     let voice
@@ -58,6 +58,7 @@ export class SelectRoom implements IFeature<SelectMenuInteraction> {
       room.roomId = voice?.id;
       await room.save();
     } catch (e) {
+      logger.error('Failed to create voice channel:', e);
       return interaction.update({
         content: 'Failed to create voice channel. Please contact support.',
         components: [],

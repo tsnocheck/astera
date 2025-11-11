@@ -1,4 +1,4 @@
-import { constructEmbed, IFeature, RoomUser, RunFeatureParams } from '@lolz-bots/shared';
+import { constructEmbed, IFeature, logger, RoomUser, RunFeatureParams } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
   ButtonInteraction,
@@ -11,12 +11,10 @@ export class SetLimits implements IFeature<ButtonInteraction> {
   name = 'setLimits';
 
   async run({ interaction }: RunFeatureParams<ButtonInteraction>) {
-    const userRooms = await RoomUserModel.find({
-      ownerId: interaction.user.id,
-    });
     const coOwners = await RoomModel.find({ coOwners: interaction.user.id });
-
-    if (userRooms.length === 0 || coOwners.length === 0) {
+    const owners = await RoomModel.find({ ownerId: interaction.user.id });
+    
+    if (owners.length === 0 && coOwners.length === 0) {
       await interaction.reply({
         content: 'You do not have a room to create.',
         ephemeral: true,
@@ -24,9 +22,8 @@ export class SetLimits implements IFeature<ButtonInteraction> {
       return;
     }
 
-    const roomIds = userRooms.map((ur: RoomUser) => ur.roomId);
     const coOwnerRoomIds = coOwners.map((room) => room._id);
-    const allRoomIds = [...roomIds, ...coOwnerRoomIds];
+    const allRoomIds = [...owners.map((room) => room._id), ...coOwnerRoomIds];
     const rooms = await RoomModel.find({ _id: { $in: allRoomIds } });
 
     if (rooms.length === 0) {
@@ -45,7 +42,7 @@ export class SetLimits implements IFeature<ButtonInteraction> {
     const action =
       new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
         new StringSelectMenuBuilder()
-          .setCustomId('selectRoom')
+          .setCustomId('selectLimitRoom')
           .setPlaceholder('Select room:')
           .addOptions(options),
       );
