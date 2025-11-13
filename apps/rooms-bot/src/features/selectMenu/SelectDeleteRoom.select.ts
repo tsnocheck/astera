@@ -30,6 +30,11 @@ export class SelectCoOwner implements IFeature<SelectMenuInteraction> {
       });
     }
 
+    const channel = interaction.guild?.channels.cache.get(room.roomId!);
+    if (channel) {
+      await channel.delete();
+    } 
+
     const roomUsers = await RoomUserModel.find({
       _id: { $in: room.users },
     });
