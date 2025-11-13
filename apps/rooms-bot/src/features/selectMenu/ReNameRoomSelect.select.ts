@@ -1,4 +1,4 @@
-import { IFeature, RunFeatureParams } from '@lolz-bots/shared';
+import { IFeature, logger, RunFeatureParams } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
   Base,
@@ -20,11 +20,12 @@ import {
 } from 'discord.js';
 import { RoomModel, RoomUserModel, RoomUser } from '@lolz-bots/shared';
 
-export class SelectLimitRoom implements IFeature<SelectMenuInteraction> {
-  name = 'selectLimitRoom';
+export class ReNameRoomSelect implements IFeature<SelectMenuInteraction> {
+  name = 'reNameRoomSelect';
 
   async run({ interaction }: RunFeatureParams<SelectMenuInteraction>) {
     const room = await RoomModel.findOne({ _id: interaction.values[0] });
+    logger.info('Selected Room:', room);
 
     if (!room) {
       return interaction.update({
@@ -43,18 +44,19 @@ export class SelectLimitRoom implements IFeature<SelectMenuInteraction> {
     }
 
     const modal = new ModalBuilder()
-      .setCustomId(`setLimitRoomModal_${room._id}`)
-      .setTitle('Установка лимита');
+      .setCustomId(`reNameRoomModal_${room._id}`)
+      .setTitle('Переименование комнаты');
 
     const limitInput = new TextInputBuilder()
-      .setCustomId(`roomLimitInput`)
-      .setLabel('Введите лимит пользователей (0 - без лимита):')
+      .setCustomId(`roomNameInput`)
+      .setLabel('Введите новое имя комнаты:')
       .setStyle(TextInputStyle.Short)
-      .setPlaceholder('например, 5')
+      .setPlaceholder('например, Моя комната')
       .setRequired(true)
-      .setMaxLength(2);
-    
-    const modalActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(limitInput);
+      .setMaxLength(32);
+
+    const modalActionRow =
+      new ActionRowBuilder<TextInputBuilder>().addComponents(limitInput);
 
     modal.addComponents(modalActionRow);
 
@@ -62,4 +64,4 @@ export class SelectLimitRoom implements IFeature<SelectMenuInteraction> {
   }
 }
 
-export default SelectLimitRoom;
+export default ReNameRoomSelect;

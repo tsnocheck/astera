@@ -26,7 +26,7 @@ class OnlineStatsNavigation implements IFeature<ButtonInteraction> {
 
     if (!room) {
       return interaction.update({
-        content: 'Room not found.',
+        content: 'Комната не найдена.',
         components: [],
         embeds: [],
       });
@@ -36,7 +36,7 @@ class OnlineStatsNavigation implements IFeature<ButtonInteraction> {
 
     if (roomUsers.length === 0) {
       return interaction.update({
-        content: 'No users found in this room.',
+        content: 'Пользователи в комнате не найдены.',
         components: [],
         embeds: [],
       });
@@ -66,7 +66,7 @@ export class SelectOnlineStatsRoom implements IFeature<SelectMenuInteraction> {
 
     if (!room) {
       return interaction.update({
-        content: 'Room not found.',
+        content: 'Комната не найдена.',
         components: [],
       });
     }
@@ -75,7 +75,7 @@ export class SelectOnlineStatsRoom implements IFeature<SelectMenuInteraction> {
 
     if (roomUsers.length === 0) {
       return interaction.update({
-        content: 'No users found in this room.',
+        content: 'Пользователи в комнате не найдены.',
         components: [],
       });
     }
@@ -118,26 +118,26 @@ export class SelectOnlineStatsRoom implements IFeature<SelectMenuInteraction> {
 
     if (userPosition !== -1) {
       const userOnlineTime = formatTime(currentUser?.online || 0);
-      description += `\n**Your position:**\n**${userPosition + 1}.** <@${userId}> - ${userOnlineTime}`;
+      description += `\n**Ваша позиция:**\n**${userPosition + 1}.** <@${userId}> - ${userOnlineTime}`;
     }
 
     const embed = constructEmbed({
-      title: `Online Statistics - ${room.name || 'Room'}`,
+      title: `Статистика онлайн - ${room.name || 'Комната'}`,
       description: description,
       customType: 'info',
-      footer: { text: `Page ${page + 1} of ${totalPages}` },
+      footer: { text: `Страница ${page + 1} из ${totalPages}` },
       timestamp: new Date().toISOString(),
     });
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId(`onlineStatsNavigation_${room._id}_${page - 1}`)
-        .setLabel('◀ Previous')
+        .setLabel('◀ Назад')
         .setStyle(ButtonStyle.Primary)
         .setDisabled(page === 0),
       new ButtonBuilder()
         .setCustomId(`onlineStatsNavigation_${room._id}_${page + 1}`)
-        .setLabel('Next ▶')
+        .setLabel('Вперёд ▶')
         .setStyle(ButtonStyle.Primary)
         .setDisabled(page >= totalPages - 1),
     );

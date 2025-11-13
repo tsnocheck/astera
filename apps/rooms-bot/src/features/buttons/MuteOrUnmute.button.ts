@@ -15,7 +15,7 @@ export class MuteOrUnmute implements IFeature<ButtonInteraction> {
 
     if (!room) {
       await interaction.reply({
-        content: 'You do not own any rooms to add a co-owner.',
+        content: 'У вас нет комнат для управления мутом.',
         ephemeral: true,
       });
       return;
@@ -26,16 +26,17 @@ export class MuteOrUnmute implements IFeature<ButtonInteraction> {
       label: room.name,
     }));
 
-    const select = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-      new StringSelectMenuBuilder()
-        .setCustomId(`selectMuteOrUnMuteRoom`)
-        .setPlaceholder('Select room:')
-        .addOptions(options),
-    );
+    const select =
+      new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+        new StringSelectMenuBuilder()
+          .setCustomId(`selectMuteOrUnMuteRoom`)
+          .setPlaceholder('Выберите комнату:')
+          .addOptions(options),
+      );
 
     const embed = constructEmbed({
-      title: 'Room Management',
-      description: 'Select users to mute or unmute in your room.',
+      title: 'Управление комнатой',
+      description: 'Выберите пользователей для выдачи или снятия мута в вашей комнате.',
       customType: 'info',
     });
 

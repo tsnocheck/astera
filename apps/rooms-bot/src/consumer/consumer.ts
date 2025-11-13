@@ -4,9 +4,9 @@ import { Kafka } from 'kafkajs';
 export const consumer = new KafkaConsumer(
   new Kafka({
     brokers: [process.env.KAFKA_BROKER!],
-    clientId: 'economy-bot',
+    clientId: 'room-bot',
   }),
-  'economy-bot-group',
+  'room-bot-group',
 );
 
 consumer.connect();

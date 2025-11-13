@@ -26,7 +26,7 @@ export class SelectInviteRoom implements IFeature<SelectMenuInteraction> {
 
     if (!room) {
       return interaction.update({
-        content: 'Room not found.',
+        content: 'Комната не найдена.',
         components: [],
       });
     }
@@ -35,13 +35,13 @@ export class SelectInviteRoom implements IFeature<SelectMenuInteraction> {
       new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(
         new UserSelectMenuBuilder()
           .setCustomId(`selectUserToInvite_${room._id}`)
-          .setPlaceholder('Select users to invite:')
+          .setPlaceholder('Выберите пользователей для приглашения:')
           .setMinValues(1)
           .setMaxValues(25),
       );
 
     await interaction.update({
-      content: `You are inviting users to room: <#${room.roomId}>`,
+      content: `Вы приглашаете пользователей в комнату: <#${room.roomId}>`,
       components: [userSelect],
     });
   }

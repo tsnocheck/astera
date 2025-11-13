@@ -17,14 +17,14 @@ import {
 import { RoomModel, RoomUserModel, RoomUser } from '@lolz-bots/shared';
 
 export class SelectCoOwnerUsers implements IFeature<SelectMenuInteraction> {
-  name = 'selectCoOwnerUsers';
+  name = 'selectUserCoOwner';
 
   async run({ interaction }: RunFeatureParams<SelectMenuInteraction>) {
     const room = await RoomModel.findOne({ ownerId: interaction.user.id });
 
     if (!room) {
       return interaction.update({
-        content: 'You do not own any rooms to add a co-owner.',
+        content: 'У вас нет комнат для добавления совладельца.',
         components: [],
       });
     }
@@ -50,6 +50,7 @@ export class SelectCoOwnerUsers implements IFeature<SelectMenuInteraction> {
           const newRoomUser = await RoomUserModel.create({
             userId: userId,
             muted: false,
+            roomId: room._id,
           });
           room.users.push(newRoomUser._id);
         }
@@ -67,15 +68,15 @@ export class SelectCoOwnerUsers implements IFeature<SelectMenuInteraction> {
 
     let message = '';
     if (added.length > 0) {
-      message += `Co-owners added: <@${added.join('>, <@')}>`;
+      message += `Совладельцы добавлены: <@${added.join('>, <@')}>`;
     }
     if (removed.length > 0) {
       if (message) message += '\n';
-      message += `Co-owners removed: <@${removed.join('>, <@')}>`;
+      message += `Совладельцы удалены: <@${removed.join('>, <@')}>`;
     }
 
     await interaction.update({
-      content: message || 'No changes made.',
+      content: message || 'Изменения не внесены.',
       components: [],
       embeds: [],
     });

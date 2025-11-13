@@ -24,7 +24,7 @@ export class SelectMuteOrUnMuteUsers implements IFeature<SelectMenuInteraction> 
 
     if (!member) {
       return interaction.reply({
-        content: 'Member not found.',
+        content: 'Участник не найден.',
         components: [],
       });
     }
@@ -33,7 +33,7 @@ export class SelectMuteOrUnMuteUsers implements IFeature<SelectMenuInteraction> 
 
     if (!channel || channel.type !== ChannelType.GuildVoice) {
       return interaction.reply({
-        content: 'You must be in the voice channel to set limits.',
+        content: 'Вы должны находиться в голосовом канале для управления мутом.',
         components: [],
       });
     }
@@ -42,7 +42,7 @@ export class SelectMuteOrUnMuteUsers implements IFeature<SelectMenuInteraction> 
 
     if (!room) {
       return interaction.reply({
-        content: 'Room not found.',
+        content: 'Комната не найдена.',
         components: [],
       });
     }
@@ -52,7 +52,7 @@ export class SelectMuteOrUnMuteUsers implements IFeature<SelectMenuInteraction> 
       !room.coOwners.includes(interaction.user.id)
     ) {
       return interaction.reply({
-        content: 'You do not have permission to set limits for this room.',
+        content: 'У вас нет прав для управления мутом в этой комнате.',
         components: [],
       });
     }
@@ -63,7 +63,7 @@ export class SelectMuteOrUnMuteUsers implements IFeature<SelectMenuInteraction> 
 
     if (!voice) {
       return interaction.reply({
-        content: 'Voice channel not found.',
+        content: 'Голосовой канал не найден.',
         components: [],
       });
     }
@@ -74,6 +74,13 @@ export class SelectMuteOrUnMuteUsers implements IFeature<SelectMenuInteraction> 
       userId: { $in: selectedUserIds },
       _id: { $in: room.users },
     });
+
+    if (roomUsers.length === 0) {
+      return interaction.reply({
+        content: 'Не найдено подходящих пользователей в этой комнате.',
+        components: [],
+      });
+    }
 
     await Promise.all(
       roomUsers.map(async (roomUser) => {
@@ -99,7 +106,7 @@ export class SelectMuteOrUnMuteUsers implements IFeature<SelectMenuInteraction> 
     );
 
     return interaction.update({
-      content: `Updated mute status for selected users.`,
+      content: `Статус мута обновлен для выбранных пользователей.`,
       components: [],
     });
   }

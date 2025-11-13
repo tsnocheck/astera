@@ -15,7 +15,7 @@ export class OnlineStats implements IFeature<ButtonInteraction> {
 
     if (!userRooms) {
       return interaction.reply({
-        content: 'You do not have are rooms.',
+        content: 'У вас нет комнат.',
         ephemeral: true,
         components: [],
       });
@@ -26,7 +26,7 @@ export class OnlineStats implements IFeature<ButtonInteraction> {
 
     if (rooms.length === 0) {
       await interaction.reply({
-        content: 'Rooms not found.',
+        content: 'Комнаты не найдены.',
         ephemeral: true,
       });
       return;
@@ -41,12 +41,12 @@ export class OnlineStats implements IFeature<ButtonInteraction> {
       new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
         new StringSelectMenuBuilder()
           .setCustomId('selectOnlineStatsRoom')
-          .setPlaceholder('Select room:')
+          .setPlaceholder('Выберите комнату:')
           .addOptions(options),
       );
 
     await interaction.reply({
-      content: 'Select room:',
+      content: 'Выберите комнату:',
       components: [action],
       ephemeral: true,
     });

@@ -27,7 +27,7 @@ export class SelectUserToInvite implements IFeature<SelectMenuInteraction> {
 
     if (!room) {
       return interaction.update({
-        content: 'Room not found.',
+        content: 'Комната не найдена.',
         components: [],
       });
     }
@@ -46,6 +46,11 @@ export class SelectUserToInvite implements IFeature<SelectMenuInteraction> {
       }
 
       if ((await user).user.bot) {
+        isBots.push(userId);
+        continue;
+      }
+
+      if ((await user).user.id === room.ownerId) {
         isBots.push(userId);
         continue;
       }
@@ -77,19 +82,19 @@ export class SelectUserToInvite implements IFeature<SelectMenuInteraction> {
 
     let message = '';
     if (addedUsers.length > 0) {
-      message += `Users invited: <@${addedUsers.join('>, <@')}>`;
+      message += `Пользователи приглашены: <@${addedUsers.join('>, <@')}>`;
     }
     if (removedUsers.length > 0) {
       if (message) message += '\n';
-      message += `Users removed: <@${removedUsers.join('>, <@')}>`;
+      message += `Пользователи удалены: <@${removedUsers.join('>, <@')}>`;
     }
     if (isBots.length > 0) {
       if (message) message += '\n';
-      message += `Bots ignored: <@${isBots.join('>, <@')}>`;
+      message += `Пользователи проигнорированы: <@${isBots.join('>, <@')}>`;
     }
 
     await interaction.update({
-      content: message || 'No changes made.',
+      content: message || 'Изменения не внесены.',
       components: [],
       embeds: [],
     });

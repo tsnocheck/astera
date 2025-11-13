@@ -22,20 +22,12 @@ import {
 import { RoomModel, RoomUserModel, RoomUser } from '@lolz-bots/shared';
 import { REPL_MODE_SLOPPY } from 'repl';
 
-export class SetLimitRoomModal implements IFeature<ModalSubmitInteraction> {
-  name = 'setLimitRoomModal';
+export class RoomNameInput implements IFeature<ModalSubmitInteraction> {
+  name = 'reNameRoomModal';
 
   async run({ interaction }: RunFeatureParams<ModalSubmitInteraction>) {
-    const roomLimitValue = interaction.fields.getTextInputValue('roomLimitInput');
-
-    const limit = parseInt(roomLimitValue, 10);
-
-    if (isNaN(limit) || limit < 0) {
-      return interaction.reply({
-        content: 'Неверное значение лимита. Пожалуйста, введите неотрицательное целое число.',
-        ephemeral: true,
-      });
-    }
+    const roomNameValue =
+      interaction.fields.getTextInputValue('roomNameInput');
 
     const roomId = interaction.customId.split('_')[1];
     const room = await RoomModel.findOne({ _id: roomId });
@@ -45,7 +37,7 @@ export class SetLimitRoomModal implements IFeature<ModalSubmitInteraction> {
         content: 'Комната не найдена.',
         components: [],
       });
-    }    
+    }
 
     const channel = interaction.guild?.channels.cache.get(room.roomId!);
 
@@ -57,26 +49,32 @@ export class SetLimitRoomModal implements IFeature<ModalSubmitInteraction> {
       });
     }
 
-    if(room.ownerId !== interaction.user.id && !room.coOwners.includes(interaction.user.id)) {
+    if (
+      room.ownerId !== interaction.user.id &&
+      !room.coOwners.includes(interaction.user.id)
+    ) {
       return interaction.reply({
-        content: 'У вас нет прав для установки лимита в этой комнате.',
+        content: 'У вас нет прав для переименования этой комнаты.',
         components: [],
       });
     }
 
     try {
-      channel.setUserLimit(limit);
+      channel.setName(roomNameValue);
+      room.name = roomNameValue;
+      await room.save();
+
       return interaction.reply({
-        content: `Лимит комнаты установлен на ${limit === 0 ? 'без лимита' : limit}.`,
+        content: `Имя комнаты изменено на ${roomNameValue}.`,
         ephemeral: true,
       });
     } catch (e) {
       return interaction.reply({
-        content: 'Не удалось установить лимит комнаты. Пожалуйста, обратитесь в поддержку.',
+        content: 'Не удалось переименовать комнату. Пожалуйста, обратитесь в поддержку.',
         components: [],
       });
     }
   }
 }
 
-export default SetLimitRoomModal;
+export default RoomNameInput;

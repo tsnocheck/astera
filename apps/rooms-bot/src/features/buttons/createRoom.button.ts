@@ -17,7 +17,7 @@ export class CreateRoom implements IFeature<ButtonInteraction> {
 
     if (rooms.length === 0) {
       await interaction.reply({
-        content: 'Rooms not found.',
+        content: 'Комнаты не найдены.',
         ephemeral: true,
       });
       return;
@@ -32,12 +32,12 @@ export class CreateRoom implements IFeature<ButtonInteraction> {
       new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
         new StringSelectMenuBuilder()
           .setCustomId('selectRoom')
-          .setPlaceholder('Select room:')
+          .setPlaceholder('Выберите комнату:')
           .addOptions(options),
       );
 
     await interaction.reply({
-      content: 'Select room:',
+      content: 'Выберите комнату:',
       components: [action],
       ephemeral: true,
     });

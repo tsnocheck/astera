@@ -57,19 +57,9 @@ export default class CreateRooms implements ICommand {
       userData = await UserModel.create({ discordID: user.id, coins: 0 });
     }
 
-    const ownerRoom = await RoomModel.findOne({ ownerId: user.id });
-
-    if (ownerRoom) {
-      await interaction.reply({
-        content: `${user.username} already owns a room.`,
-        ephemeral: true,
-      });
-      return;
-    }
-
     if (userData.coins < cost) {
       await interaction.reply({
-        content: `${user.username} does not have enough balance to create a room.`,
+        content: `У ${user.username} недостаточно средств для создания комнаты.`,
         ephemeral: true,
       });
       return;
@@ -77,7 +67,6 @@ export default class CreateRooms implements ICommand {
 
     userData.coins -= cost;
     await userData.save();
-
 
     const room = new RoomModel({
       name: name,
@@ -97,7 +86,7 @@ export default class CreateRooms implements ICommand {
     await room.save();
 
     await interaction.reply({
-      content: `Room "${name}" created successfully for ${user.username}.`,
+      content: `Комната "${name}" успешно создана для ${user.username}.`,
       ephemeral: true,
     });
   }

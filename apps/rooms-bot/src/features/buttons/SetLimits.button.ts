@@ -16,7 +16,7 @@ export class SetLimits implements IFeature<ButtonInteraction> {
     
     if (owners.length === 0 && coOwners.length === 0) {
       await interaction.reply({
-        content: 'You do not have a room to create.',
+        content: 'У вас нет комнат для установки лимитов.',
         ephemeral: true,
       });
       return;
@@ -28,7 +28,7 @@ export class SetLimits implements IFeature<ButtonInteraction> {
 
     if (rooms.length === 0) {
       await interaction.reply({
-        content: 'Rooms not found.',
+        content: 'Комнаты не найдены.',
         ephemeral: true,
       });
       return;
@@ -43,12 +43,12 @@ export class SetLimits implements IFeature<ButtonInteraction> {
       new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
         new StringSelectMenuBuilder()
           .setCustomId('selectLimitRoom')
-          .setPlaceholder('Select room:')
+          .setPlaceholder('Выберите комнату:')
           .addOptions(options),
       );
 
     await interaction.reply({
-      content: 'Select room:',
+      content: 'Выберите комнату:',
       components: [action],
       ephemeral: true,
     });

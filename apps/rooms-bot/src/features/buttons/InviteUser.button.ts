@@ -16,7 +16,7 @@ export class InviteRoom implements IFeature<ButtonInteraction> {
 
     if (!ownerRoom && coOwners.length === 0) {
       await interaction.reply({
-        content: 'You do not own any rooms to add a co-owner.',
+        content: 'У вас нет комнат для приглашения пользователей.',
         ephemeral: true,
       });
       return;
@@ -30,7 +30,7 @@ export class InviteRoom implements IFeature<ButtonInteraction> {
 
     if (rooms.length === 0) {
       await interaction.reply({
-        content: 'Rooms not found.',
+        content: 'Комнаты не найдены.',
         ephemeral: true,
       });
       return;
@@ -45,12 +45,12 @@ export class InviteRoom implements IFeature<ButtonInteraction> {
       new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
         new StringSelectMenuBuilder()
           .setCustomId(`selectInviteRoom`)
-          .setPlaceholder('Select room:')
+          .setPlaceholder('Выберите комнату:')
           .addOptions(options),
       );
 
     await interaction.reply({
-      content: 'Select room:',
+      content: 'Выберите комнату:',
       components: [action],
       ephemeral: true,
     });

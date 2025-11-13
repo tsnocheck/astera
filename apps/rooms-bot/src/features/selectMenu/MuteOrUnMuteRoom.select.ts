@@ -18,7 +18,7 @@ import {
 import { RoomModel, RoomUserModel, RoomUser } from '@lolz-bots/shared';
 
 export class SelectMuteOrUnMuteUsers implements IFeature<SelectMenuInteraction> {
-  name = 'selectMuteOrUnMuteUsers';
+  name = 'selectMuteOrUnMuteRoom';
 
   async run({ interaction }: RunFeatureParams<SelectMenuInteraction>) {
     const room = await RoomModel.findOne({
@@ -27,21 +27,22 @@ export class SelectMuteOrUnMuteUsers implements IFeature<SelectMenuInteraction> 
 
     if (!room) {
       return interaction.update({
-        content: 'Room not found.',
+        content: 'Комната не найдена.',
         components: [],
       });
     }
 
-    const userSelect = new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(
-      new UserSelectMenuBuilder()
-        .setCustomId(`selectMuteOrUnMuteUsers_${room._id.toString()}`)
-        .setPlaceholder('Select users to mute or unmute:')
-        .setMinValues(1)
-        .setMaxValues(25),
-    );
+    const userSelect =
+      new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(
+        new UserSelectMenuBuilder()
+          .setCustomId(`selectMuteOrUnMuteUsers_${room._id.toString()}`)
+          .setPlaceholder('Выберите пользователей для мута/анмута:')
+          .setMinValues(1)
+          .setMaxValues(25),
+      );
 
     await interaction.update({
-      content: `You are muting or unmuting users in room: ${room.name}`,
+      content: `Вы управляете мутом пользователей в комнате: ${room.name}`,
       components: [userSelect],
     });
   }

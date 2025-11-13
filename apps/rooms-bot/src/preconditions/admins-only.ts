@@ -22,7 +22,7 @@ export default class AminsOnly implements IPrecondition {
     }
     if (interaction.isRepliable()) {
       await interaction.reply({
-        content: 'You do not have permission to use this command.',
+        content: 'У вас нет прав для использования этой команды.',
         flags: [MessageFlags.Ephemeral],
       });
     }

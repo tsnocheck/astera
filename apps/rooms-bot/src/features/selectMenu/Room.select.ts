@@ -24,7 +24,16 @@ export class SelectRoom implements IFeature<SelectMenuInteraction> {
 
     if (!room) {
       return interaction.update({
-        content: 'Room not found.',
+        content: 'Комната не найдена.',
+        components: [],
+      });
+    }
+
+    const channel = await interaction.guild?.channels.cache.get(room.roomId!);
+
+    if (channel) {
+      return interaction.update({
+        content: `Голосовой канал <#${room.roomId}> уже существует.`,
         components: [],
       });
     }
@@ -60,14 +69,28 @@ export class SelectRoom implements IFeature<SelectMenuInteraction> {
     } catch (e) {
       logger.error('Failed to create voice channel:', e);
       return interaction.update({
-        content: 'Failed to create voice channel. Please contact support.',
+        content: 'Не удалось создать голосовой канал. Пожалуйста, обратитесь в поддержку.',
         components: [],
       });
     }
-    return interaction.update({
-      content: `Voice channel <#${voice?.id}> created successfully!`,
+    await interaction.update({
+      content: `Голосовой канал <#${voice?.id}> успешно создан!`,
       components: [],
-    })
+    });
+
+    setTimeout(async () => {
+      if (!voice) return;
+      
+      if (voice.members.size === 0) {
+        try {
+          await voice?.delete();
+          room.roomId = undefined;
+          await room.save();
+        } catch (e) {
+          logger.error('Failed to delete voice channel:', e);
+        }
+      }
+    }, 1000 * 5 * 60);
   }
 }
 

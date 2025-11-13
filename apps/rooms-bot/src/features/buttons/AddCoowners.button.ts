@@ -15,7 +15,7 @@ export class AddCoOwner implements IFeature<ButtonInteraction> {
 
     if (!room) {
       await interaction.reply({
-        content: 'You do not own any rooms to add a co-owner.',
+        content: 'У вас нет комнат для добавления совладельца.',
         ephemeral: true,
       });
       return;
@@ -29,14 +29,14 @@ export class AddCoOwner implements IFeature<ButtonInteraction> {
     const select = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
       new StringSelectMenuBuilder()
         .setCustomId(`selectCoOwner`)
-        .setPlaceholder('Select room:')
+        .setPlaceholder('Выберите комнату:')
         .addOptions(options),
     );
 
     const embed = constructEmbed({
-      title: 'Room Management',
+      title: 'Управление комнатой',
       description:
-          'Select room to add co-owner.',
+          'Выберите комнату для добавления совладельца.',
       customType: 'info',
     });
     

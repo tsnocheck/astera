@@ -13,23 +13,23 @@ export default class CreateRooms implements ICommand {
     const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('inviteRoom')
-        .setLabel('Пригласить')
+        .setEmoji('<:invite:1438555700275183726>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('muteOrUnMute')
-        .setLabel('Заглушить')
+        .setEmoji('<:mute:1438555706063196191>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('addCoOwner')
-        .setLabel('Добавить со-владельца')
+        .setEmoji('<:coowner:1438555703168995491>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('setLimits')
-        .setLabel('Установить лимиты')
+        .setEmoji('<:limits:1438555707854159882>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('reName')
-        .setLabel('Переименовать')
+        .setEmoji('<:rename:1438555701759836230>')
         .setStyle(ButtonStyle.Secondary),
     );
 
@@ -51,16 +51,25 @@ export default class CreateRooms implements ICommand {
 
     if (!channel || !channel.isTextBased() || channel.isDMBased()) {
       await interaction.reply({
-        content: 'This command can only be used in a server text channel.',
+        content: 'Эта команда может использоваться только в текстовом канале сервера.',
         ephemeral: true,
       });
       return;
     }
 
     const embed = constructEmbed({
-      title: 'Room Management',
-      description:
-        'Use the buttons below to manage your room settings and options.',
+      title: 'Панель управления',
+      description: `
+      <:invite:1438555700275183726> - Пригласить/Удалить участников
+      <:mute:1438555706063196191> - Выдать/Снять мут участнику
+      <:coowner:1438555703168995491> - Добавить/Удалить совладельца
+      <:limits:1438555707854159882> - Установить лимиты участников
+      <:rename:1438555701759836230> - Переименовать комнату
+      ㅤ
+      Нажмите на кнопку "Онлайн комнаты", чтобы просмотреть статистику онлайн по вашей комнате.
+      ㅤ
+      Нажмите на кнопку "Создать", чтобы создать новую приватную комнату.
+      `,
       customType: 'info',
     });
 
@@ -70,7 +79,7 @@ export default class CreateRooms implements ICommand {
     });
 
     await interaction.reply({
-      content: 'Embed with buttons sent successfully.',
+      content: 'Эмбед с кнопками успешно отправлен.',
       ephemeral: true,
     });
   }

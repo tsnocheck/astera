@@ -25,7 +25,7 @@ export class SelectCoOwner implements IFeature<SelectMenuInteraction> {
 
     if (!room) {
       return interaction.update({
-        content: 'Room not found.',
+        content: 'Комната не найдена.',
         components: [],
       });
     }
@@ -33,14 +33,13 @@ export class SelectCoOwner implements IFeature<SelectMenuInteraction> {
     const userSelect =
       new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(
         new UserSelectMenuBuilder()
-          .setCustomId(`selectUserToCoOwner_${room._id}`)
-          .setPlaceholder('Select users to invite:')
+          .setCustomId(`selectUserCoOwner_${room._id}`)
+          .setPlaceholder('Выберите пользователей:')
           .setMinValues(1)
           .setMaxValues(25),
       );
 
     await interaction.update({
-      content: `You are inviting users to room: <#${room.roomId}>`,
       components: [userSelect],
     });
   }
