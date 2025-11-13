@@ -1,6 +1,6 @@
 import { constructEmbed, ICommand, RunCommandParams } from '@lolz-bots/shared';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
-import CreateRoom from '../features/buttons/CreateRoom.button';
+import CreateRoom from '../features/buttons/createRoom.button';
 
 export default class CreateRooms implements ICommand {
   name = 'create-embed';
