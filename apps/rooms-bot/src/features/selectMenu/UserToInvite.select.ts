@@ -67,6 +67,14 @@ export class SelectUserToInvite implements IFeature<SelectMenuInteraction> {
         room.coOwners = room.coOwners.filter((id) => id !== userId);
         await RoomUserModel.deleteOne({ _id: existingRoomUser._id });
         removedUsers.push(userId);
+
+        const channel = interaction.guild?.channels.cache.get(room.roomId!) as VoiceChannel;
+        if (!channel) continue;
+
+        await channel.permissionOverwrites.edit(userId, {
+          Connect: true,
+        });
+
       } else {
         const newRoomUser = await RoomUserModel.create({
           roomId: room._id,
