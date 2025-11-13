@@ -3,7 +3,9 @@ import {
   RunCommandParams,
 } from '@lolz-bots/shared';
 import {
+  ActionRowBuilder,
   ApplicationCommandOptionData,
+  StringSelectMenuBuilder,
 } from 'discord.js';
 import {
   ApplicationCommandOptionType,
@@ -26,9 +28,9 @@ export default class DeleteRooms implements ICommand {
   async run({ interaction }: RunCommandParams) {
     const user = interaction.options.getUser('member') || interaction.user;
 
-    const room = await RoomModel.findOne({ ownerId: user.id });
+    const rooms = await RoomModel.find({ ownerId: user.id });
 
-    if (!room) {
+    if (!rooms) {
       await interaction.reply({
         content: `No room found for user ${user.username}.`,
         ephemeral: true,
@@ -36,11 +38,20 @@ export default class DeleteRooms implements ICommand {
       return;
     }
 
-    await RoomModel.deleteOne({ _id: room._id });
-    await RoomUserModel.deleteMany({ roomId: room._id });
+    const options = rooms.map((room) => ({
+      value: room._id.toString(),
+      label: room.name,
+    }));
+
+    const selectRoom = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId(`selectDeleteRoom`)
+        .setPlaceholder('Выберите комнату для удаления:')
+        .addOptions(options),
+    );
 
     await interaction.reply({
-      content: `Room for user ${user.username} has been deleted.`,
+      components: [selectRoom],
       ephemeral: true,
     });
   }
