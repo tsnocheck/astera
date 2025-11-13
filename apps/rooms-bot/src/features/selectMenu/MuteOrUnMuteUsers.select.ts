@@ -88,14 +88,6 @@ export class SelectMuteOrUnMuteUsers implements IFeature<SelectMenuInteraction> 
         if (!user) return;
 
         if (roomUser.muted) {
-
-          if (!voice.permissionOverwrites.cache.get(roomUser.userId)) {
-            logger.info('Creating permission overwrite for unmuting user:', roomUser.userId);
-            await voice.permissionOverwrites.edit(roomUser.userId, {
-              Speak: true,
-            });
-          }
-
           await voice.permissionOverwrites.edit(roomUser.userId, {
             Speak: true,
           });
