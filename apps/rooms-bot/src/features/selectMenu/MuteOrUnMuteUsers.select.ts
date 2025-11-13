@@ -97,13 +97,13 @@ export class SelectMuteOrUnMuteUsers implements IFeature<SelectMenuInteraction> 
           }
 
           await voice.permissionOverwrites.edit(roomUser.userId, {
-            Speak: false,
+            Speak: true,
           });
           roomUser.muted = false;
           await user.voice.setChannel(channel.id);
         } else {
           await voice.permissionOverwrites.edit(roomUser.userId, {
-            Speak: true,
+            Speak: false,
           });
           roomUser.muted = true;
           await user.voice.setChannel(channel.id);
