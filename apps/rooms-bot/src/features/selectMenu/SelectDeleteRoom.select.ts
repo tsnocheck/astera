@@ -17,8 +17,8 @@ import {
 } from 'discord.js';
 import { RoomModel, RoomUserModel, RoomUser } from '@lolz-bots/shared';
 
-export class SelectCoOwner implements IFeature<SelectMenuInteraction> {
-  name = 'selectCoOwner';
+export class SelectDeleteRoom implements IFeature<SelectMenuInteraction> {
+  name = 'selectDeleteRoom';
 
   async run({ interaction }: RunFeatureParams<SelectMenuInteraction>) {
     const room = await RoomModel.findOne({ _id: interaction.values[0] });
@@ -33,7 +33,7 @@ export class SelectCoOwner implements IFeature<SelectMenuInteraction> {
     const channel = interaction.guild?.channels.cache.get(room.roomId!);
     if (channel) {
       await channel.delete();
-    } 
+    }
 
     const roomUsers = await RoomUserModel.find({
       _id: { $in: room.users },
@@ -46,4 +46,4 @@ export class SelectCoOwner implements IFeature<SelectMenuInteraction> {
   }
 }
 
-export default SelectCoOwner;
+export default SelectDeleteRoom;
