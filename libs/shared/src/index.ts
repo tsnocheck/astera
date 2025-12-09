@@ -18,3 +18,4 @@ export * from './lib/models/Config';
 export * from './lib/models/Item';
 export * from './lib/models/Case';
 export * from './lib/models/Room';
+export * from './lib/models/VerifRoles'
