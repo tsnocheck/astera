@@ -193,7 +193,6 @@ class EnterCodeModal implements IFeature<ModalSubmitInteraction> {
       [],
     );
 
-
     const userLolz = await client.api.sendRequest<ResponseUser>(
       createUsersUrl,
       {
@@ -259,11 +258,19 @@ class EnterCodeModal implements IFeature<ModalSubmitInteraction> {
     await logs.send({
       embeds: [log],
     });
-    await UserModel.create({
-      discordID: interaction.user.id,
-      lolzId: profiles.get(interaction.user.id),
-      verified: true,
-    });
+
+    const user = await UserModel.findOne({ discordID: interaction.user.id, verified: false });
+
+    if(!user){
+      await UserModel.create({
+        discordID: interaction.user.id,
+        lolzId: profiles.get(interaction.user.id),
+        verified: true,
+      });
+    } else {
+      user.verified = true;
+      await user.save();
+    }
 
     const role = await interaction.guild!.roles.fetch(
       process.env.VERIFIED_ROLE_ID!,
