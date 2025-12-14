@@ -297,7 +297,7 @@ class EnterCodeModal implements IFeature<ModalSubmitInteraction> {
       .setTitle('Успешная верификация')
       .setDescription('Вы успешно прошли верификацию.')
       .setColor('Green');
-    await interaction.followUp({
+    await interaction.reply({
       embeds: [verifiedEmbed],
       components: [],
       content: '',
