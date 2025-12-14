@@ -260,7 +260,7 @@ class EnterCodeModal implements IFeature<ModalSubmitInteraction> {
       embeds: [log],
     });
     await UserModel.create({
-      discordId: interaction.user.id,
+      discordID: interaction.user.id,
       lolzId: profiles.get(interaction.user.id),
       verified: true,
     });
