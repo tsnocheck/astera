@@ -297,11 +297,10 @@ class EnterCodeModal implements IFeature<ModalSubmitInteraction> {
       .setTitle('Успешная верификация')
       .setDescription('Вы успешно прошли верификацию.')
       .setColor('Green');
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [verifiedEmbed],
       components: [],
       content: '',
-      flags: [MessageFlags.Ephemeral],
     });
   }
 }
