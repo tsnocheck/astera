@@ -42,7 +42,7 @@ class BotClient extends Client {
     this.features = new Map<string, IFeature<unknown>>();
     this.preconditions = new Map<string, IPrecondition>();
     this.registry = new Registry(this);
-    this.api = new LolzApi(process.env.LOLZ_API_KEY!);
+    this.api = new LolzApi(process.env.LOLZ_API_KEY!, process.env.LOLZ_API_URL!);
   }
 
   public async build(token: string, rootDir: string) {
