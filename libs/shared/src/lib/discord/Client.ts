@@ -11,12 +11,14 @@ import mongoose from 'mongoose';
 import { Registry } from './Registry';
 import { IPrecondition } from './Precondition';
 import * as process from 'node:process';
+import { LolzApi } from '../lolz/api';
 
 class BotClient extends Client {
   commands: Map<string, ICommand>;
   features: Map<string, IFeature<unknown>>;
   preconditions: Map<string, IPrecondition>;
   registry: Registry;
+  api: LolzApi;
 
   constructor() {
     super({
@@ -40,6 +42,7 @@ class BotClient extends Client {
     this.features = new Map<string, IFeature<unknown>>();
     this.preconditions = new Map<string, IPrecondition>();
     this.registry = new Registry(this);
+    this.api = new LolzApi(process.env.LOLZ_API_KEY!);
   }
 
   public async build(token: string, rootDir: string) {
