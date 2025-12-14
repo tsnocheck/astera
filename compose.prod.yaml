@@ -41,6 +41,18 @@ services:
     depends_on:
       - mongo
       - broker
+  verif-bot:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: apps/verif-bot/Dockerfile
+    env_file:
+      - .env.verif
+    networks:
+      - bridge
+    depends_on:
+      - mongo
+      - broker
   broker:
     image: apache/kafka:latest
     expose:
