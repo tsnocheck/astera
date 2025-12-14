@@ -6,15 +6,15 @@ RUN corepack enable
 
 COPY package.json yarn.lock ./
 
-RUN mkdir -p libs/shared && mkdir -p apps/rooms-bot
+RUN mkdir -p libs/shared && mkdir -p apps/verif-bot
 COPY libs/shared/package.json ./libs/shared/
-COPY apps/rooms-bot/package.json ./apps/rooms-bot/
+COPY apps/verif-bot/package.json ./apps/verif-bot/
 
 RUN yarn install
 
 COPY . .
 
-RUN yarn workspace rooms-bot build
+RUN yarn workspace verif-bot build
 
 FROM node:23-slim AS runner
 
@@ -24,12 +24,12 @@ RUN corepack enable
 
 COPY package.json yarn.lock ./
 
-RUN mkdir -p libs/shared && mkdir -p apps/rooms-bot
+RUN mkdir -p libs/shared && mkdir -p apps/verif-bot
 COPY libs/shared/package.json ./libs/shared/
-COPY apps/rooms-bot/package.json ./apps/rooms-bot/
+COPY apps/verif-bot/package.json ./apps/verif-bot/
 
 RUN yarn workspaces focus --all --production
-COPY --from=builder /app/apps/rooms-bot/dist ./apps/rooms-bot/dist
+COPY --from=builder /app/apps/verif-bot/dist ./apps/verif-bot/dist
 COPY --from=builder /app/libs/shared/dist ./libs/shared/dist
 
-CMD ["yarn", "workspace", "rooms-bot", "start"]
+CMD ["yarn", "workspace", "verif-bot", "start"]
