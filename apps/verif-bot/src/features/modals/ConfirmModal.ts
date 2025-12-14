@@ -1,4 +1,10 @@
-import { IFeature } from '@lolz-bots/shared';
+import {
+  BotClient,
+  IFeature,
+  logger,
+  UserModel,
+  VerifRolesModel,
+} from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -12,10 +18,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
-import { BotClient } from '@lolz-bots/shared';
-import { logger } from '@lolz-bots/shared';
 import { Response } from '../buttons/VerifyButton';
-import { UserModel, VerifRolesModel } from '@lolz-bots/shared';
 import axios from 'axios';
 
 const codes: Map<string, number> = new Map();
@@ -34,29 +37,36 @@ export default class ConfirmModal implements IFeature<ModalSubmitInteraction> {
     client: BotClient;
   }) {
     const nickname = interaction.fields.getTextInputValue('nickname');
-    
+
     try {
-      const findResponse = await axios.get<Response>('https://prod-api.lolz.live/users/find', {
-        params: {
-          username: nickname,
-          'custom_fields[discord]': interaction.user.username,
-        },
+      const findUrl = client.api.buildUrl('users/find', [
+      {
+        key: 'username',
+        value: nickname,
+      },
+      {
+        key: 'custom_fields[discord]',
+        value: interaction.user.username,
+      },
+    ]);
+    const findResponse = await client.api.sendRequest<Response>(findUrl);
+    if (findResponse === null || findResponse?.users.length === 0) {
+      return interaction.reply({
+        components: [],
+        embeds: [],
+        content:
+          'Не обнаружил пользователя с таким никнеймом или у вас не привязан дискорд.',
+        ephemeral: true,
       });
-
-      if (!findResponse.data || findResponse.data.users.length === 0) {
-        return interaction.reply({
-          components: [],
-          embeds: [],
-          content:
-            'Не обнаружил пользователя с таким никнеймом или у вас не привязан дискорд.',
-          ephemeral: true,
-        });
-      }
-
+    }
       const user = findResponse.data.users.find(
-        (i: { fields?: Array<{ id: string; value: string }>; custom_fields?: { discord: string } }) =>
-          i.fields?.find((f: { id: string; value: string }) => f.id === 'discord')?.value ===
-            interaction.user.username ||
+        (i: {
+          fields?: Array<{ id: string; value: string }>;
+          custom_fields?: { discord: string };
+        }) =>
+          i.fields?.find(
+            (f: { id: string; value: string }) => f.id === 'discord',
+          )?.value === interaction.user.username ||
           i.custom_fields?.discord === interaction.user.username,
       );
 
@@ -70,23 +80,22 @@ export default class ConfirmModal implements IFeature<ModalSubmitInteraction> {
         });
       }
 
-      const code = Math.round(1000 + Math.random() * 9000);
-
-      await axios.post(
-        'https://prod-api.lolz.live/conversations',
-        {
-          message_body: `Ваш код для верификации: ${code}`,
-        },
-        {
-          params: {
-            recipient_id: user.user_id,
-            is_group: false,
-          },
-        }
-      );
-
       await interaction.deferReply({
         ephemeral: true,
+      });
+
+      const code = Math.round(1000 + Math.random() * 9000);
+
+      const createConversationUrl = client.api.buildUrl('conversations', [
+        { key: 'recipient_id', value: user.user_id },
+        { key: 'is_group', value: false },
+      ]);
+
+      await client.api.sendRequest(createConversationUrl, {
+        body: JSON.stringify({
+          message_body: `Ваш код для верификации: ${code}`,
+        }),
+        method: 'POST',
       });
 
       const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -95,18 +104,18 @@ export default class ConfirmModal implements IFeature<ModalSubmitInteraction> {
           .setStyle(ButtonStyle.Success)
           .setCustomId('EnterCode'),
       );
-      
+
       await interaction.editReply({
         components: [row],
         embeds: [],
         content: 'Отправил код в лс',
       });
-      
+
       _interaction = interaction;
       codes.set(interaction.user.id, code);
-      profiles.set(interaction.user.id, findResponse.data.users[0]?.user_id);
-    } catch (e) {
-      logger.error(e);
+      profiles.set(interaction.user.id, findResponse.users[0]?.user_id);
+    } catch (e: unknown) {
+      logger.error(JSON.stringify(e));
       return interaction.editReply({
         components: [],
         embeds: [],
@@ -175,18 +184,18 @@ class EnterCodeModal implements IFeature<ModalSubmitInteraction> {
       process.env.LOGS_CHANNEL_ID!,
     )) as TextChannel;
 
-    const userLolz = await axios.get(
-      'https://prod-api.lolz.live/users/' + profiles.get(interaction.user.id)
-    );
+    const createUsersUrl = client.api.buildUrl('users' + profiles.get(interaction.user.id), []);
 
-    const userGroups = userLolz.data.user.user_groups;
+    const userLolz = await client.api.sendRequest<ResponseUser>(createUsersUrl, {
+        method: 'GET',
+    });
 
-    const member = await interaction.guild!.members.fetch(
-      interaction.user.id,
-    );
+    const userGroups = userLolz?.user.users_groups;
 
-    let roles: string[] = []
+    const member = await interaction.guild!.members.fetch(interaction.user.id);
 
+    let roles: string[] = [];
+    
     for (const group of userGroups) {
       const verifRole = await VerifRolesModel.findOne({
         groupId: group.user_group_id,
@@ -200,10 +209,7 @@ class EnterCodeModal implements IFeature<ModalSubmitInteraction> {
             `Выдана роль ${verifRole.roleId} для группы ${group.user_group_id} пользователю ${interaction.user.id}`,
           );
         } catch (e) {
-          logger.error(
-            `Ошибка при выдаче роли ${verifRole.roleId}:`,
-            e,
-          );
+          logger.error(`Ошибка при выдаче роли ${verifRole.roleId}:`, e);
         }
       }
     }
@@ -224,7 +230,7 @@ class EnterCodeModal implements IFeature<ModalSubmitInteraction> {
       {
         name: 'Выданы роли',
         value: roles.map((role) => `<@&${role}>`).join(', ') || 'Нет групп',
-      }
+      },
     ]);
 
     await logs.send({
@@ -249,15 +255,39 @@ class EnterCodeModal implements IFeature<ModalSubmitInteraction> {
         logger.error(e);
       }
     }
+
+    const unVerifiedRole = await interaction.guild!.roles.fetch(
+      process.env.UNVERIFIED_ROLE_ID!,
+    );
+    if (unVerifiedRole) {
+      try {
+        const member = await interaction.guild!.members.fetch(
+          interaction.user.id,
+        );
+        await member.roles.remove(unVerifiedRole.id);
+      } catch (e) {
+        logger.error(e);
+      }
+    }
+
     const verifiedEmbed = new EmbedBuilder()
       .setTitle('Успешная верификация')
       .setDescription('Вы успешно прошли верификацию.')
       .setColor('Green');
     await interaction.deferUpdate();
-    await _interaction.editReply({
+    await interaction.editReply({
       embeds: [verifiedEmbed],
       components: [],
       content: '',
     });
   }
+}
+
+export interface ResponseUser {
+  user: Users;
+}
+
+interface Users {
+  user_id: number;
+  users_groups: Array<{ user_group_id: number }>;
 }
