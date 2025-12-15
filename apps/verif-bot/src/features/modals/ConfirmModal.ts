@@ -259,7 +259,7 @@ class EnterCodeModal implements IFeature<ModalSubmitInteraction> {
       embeds: [log],
     });
 
-    const user = await UserModel.findOne({ discordID: interaction.user.id, verified: false });
+    const user = await UserModel.findOne({ discordID: interaction.user.id });
 
     if(!user){
       await UserModel.create({
