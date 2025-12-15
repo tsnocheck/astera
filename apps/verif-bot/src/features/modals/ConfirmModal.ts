@@ -268,6 +268,16 @@ class EnterCodeModal implements IFeature<ModalSubmitInteraction> {
         verified: true,
       });
     } else {
+      if(user.verified == true){
+        error.setDescription('Вы уже прошли верификацию.');
+        await interaction.editReply({
+          content: '',
+          components: [],
+          embeds: [error],
+          flags: [MessageFlags.Ephemeral],
+        });
+        return;
+      }
       user.verified = true;
       await user.save();
     }
