@@ -38,7 +38,7 @@ export default class InteractionCreateEvent implements IEvent {
         interaction.isModalSubmit()
       ) {
         const feature = client.features.get(
-          interaction.customId.split(':').shift()!,
+          interaction.customId.split('_').shift()!,
         );
         if (feature) {
           const preconditions = feature.preconditions?.map((pre) =>

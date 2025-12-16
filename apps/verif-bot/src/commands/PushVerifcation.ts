@@ -29,7 +29,7 @@ export default class CreateRooms implements ICommand {
   ];
 
   async run({ interaction }: RunCommandParams) {
-const channel = interaction.options.getChannel('channel');
+    const channel = interaction.options.getChannel('channel');
     if(!channel) return
     if (channel.type !== ChannelType.GuildText) {
       return interaction.reply({
