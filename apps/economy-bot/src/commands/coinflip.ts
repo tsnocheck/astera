@@ -106,7 +106,10 @@ export default class Coinflip implements ICommand {
 
     await this.sleep(300);
 
-    const winAmount = won ? bet : -bet;
+    let winAmount = won ? bet : -bet;
+    if (won) {
+      winAmount = Math.floor(winAmount * 0.98);
+    }
     userProfile.coins += winAmount;
     await userProfile.save();
 

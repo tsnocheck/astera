@@ -41,6 +41,12 @@ export class User extends TimeStamps implements Base {
   timelyBonusClaimedAt!: Date | null;
 
   @Prop({ default: 0 })
+  level!: number;
+
+  @Prop({ default: 0 })
+  online!: number;
+
+  @Prop({ default: 0 })
   prestige!: number;
 
   @Prop({ type: () => [UserInventoryItem], default: [] })

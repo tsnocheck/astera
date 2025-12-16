@@ -145,7 +145,10 @@ export default class Roulette implements ICommand {
     await this.sleep(500);
 
     const { won, multiplier } = this.checkWin(type, chosenNumber, result);
-    const winAmount = won ? bet * multiplier - bet : -bet;
+    let winAmount = won ? bet * multiplier - bet : -bet;
+    if (won) {
+      winAmount = Math.floor(winAmount * 0.98);
+    }
     
     userProfile.coins += winAmount;
     await userProfile.save();

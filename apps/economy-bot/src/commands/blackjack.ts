@@ -100,7 +100,10 @@ export default class Blackjack implements ICommand {
 
     if (playerScore === 21) {
       gameState.gameOver = true;
-      const winAmount = dealerScore === 21 ? bet : Math.floor(bet * 2.5);
+      let winAmount = dealerScore === 21 ? bet : Math.floor(bet * 2.5);
+      if (dealerScore !== 21) {
+        winAmount = Math.floor(winAmount * 0.98);
+      }
       userProfile.coins += winAmount;
       await userProfile.save();
 
@@ -303,7 +306,7 @@ class BlackjackButtons implements IFeature<ButtonInteraction> {
 
     if (dealerScore > 21 || playerScore > dealerScore) {
       result = 'win';
-      winAmount = gameState.bet * 2;
+      winAmount = Math.floor(gameState.bet * 2 * 0.98);
     } else if (playerScore === dealerScore) {
       result = 'push';
       winAmount = gameState.bet;

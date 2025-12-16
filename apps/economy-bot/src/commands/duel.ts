@@ -189,7 +189,9 @@ class AcceptDuel implements IFeature<ButtonInteraction> {
     const winner = Math.random() < 0.5 ? challenger : acceptor;
     const loser = winner === challenger ? acceptor : challenger;
 
-    winner.coins += bet * 2;
+    const totalPot = bet * 2;
+    const commission = Math.floor(totalPot * 0.02);
+    winner.coins += totalPot - commission;
 
     await challenger.save();
     await acceptor.save();

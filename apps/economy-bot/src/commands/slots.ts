@@ -123,24 +123,24 @@ export default class Slots implements ICommand {
 
     if (first === second && second === third) {
       if (first === this.JACKPOT_SYMBOL) {
-        return { winAmount: bet * 10, message: '🎉 ДЖЕКПОТ! Три семерки! x10' };
+        return { winAmount: Math.floor(bet * 10 * 0.98), message: '🎉 ДЖЕКПОТ! Три семерки! x10' };
       }
       if (first === this.RARE_SYMBOL) {
-        return { winAmount: bet * 7, message: '💎 Три бриллианта! x7' };
+        return { winAmount: Math.floor(bet * 7 * 0.98), message: '💎 Три бриллианта! x7' };
       }
-      return { winAmount: bet * 5, message: '🎊 Три одинаковых символа! x5' };
+      return { winAmount: Math.floor(bet * 5 * 0.98), message: '🎊 Три одинаковых символа! x5' };
     }
 
     if (first === second || second === third || first === third) {
       const matchedSymbol = first === second ? first : (second === third ? second : first);
       
       if (matchedSymbol === this.JACKPOT_SYMBOL) {
-        return { winAmount: bet * 3, message: '✨ Две семерки! x3' };
+        return { winAmount: Math.floor(bet * 3 * 0.98), message: '✨ Две семерки! x3' };
       }
       if (matchedSymbol === this.RARE_SYMBOL) {
-        return { winAmount: bet * 2, message: '💫 Два бриллианта! x2' };
+        return { winAmount: Math.floor(bet * 2 * 0.98), message: '💫 Два бриллианта! x2' };
       }
-      return { winAmount: Math.floor(bet * 0.5), message: '⭐ Два одинаковых символа! x0.5' };
+      return { winAmount: Math.floor(bet * 0.5 * 0.98), message: '⭐ Два одинаковых символа! x0.5' };
     }
 
     return { winAmount: -bet, message: '😔 Не повезло. Попробуйте еще раз!' };

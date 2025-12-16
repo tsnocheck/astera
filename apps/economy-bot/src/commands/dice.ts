@@ -109,7 +109,10 @@ export default class Dice implements ICommand {
 
     await this.sleep(500);
 
-    const winAmount = won ? bet * 5 : -bet;
+    let winAmount = won ? bet * 5 : -bet;
+    if (won) {
+      winAmount = Math.floor(winAmount * 0.98);
+    }
     userProfile.coins += winAmount;
     await userProfile.save();
 
