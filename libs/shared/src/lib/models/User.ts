@@ -34,6 +34,12 @@ export class User extends TimeStamps implements Base {
   @Prop({ default: 0 })
   xp!: number;
 
+  @Prop({ default: false, required: true })
+  verified!: boolean;
+
+  @Prop({ default: null })
+  timelyBonusClaimedAt!: Date | null;
+
   @Prop({ default: 0 })
   prestige!: number;
 

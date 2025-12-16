@@ -76,7 +76,7 @@ class ShowCases implements IFeature<ButtonInteraction> {
     cases.forEach((c) => {
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId(`buy_case:${c.id}`)
+          .setCustomId(`buy-case_${c.id}`)
           .setLabel(`Open ${c.name}`)
           .setStyle(ButtonStyle.Success),
       );
@@ -91,10 +91,10 @@ class ShowCases implements IFeature<ButtonInteraction> {
 }
 
 class BuyCase implements IFeature<ButtonInteraction> {
-  name = 'buy_case';
+  name = 'buy-case';
 
   async run({ interaction }: RunFeatureParams<ButtonInteraction>) {
-    const caseId = interaction.customId.split(':')[1];
+    const caseId = interaction.customId.split('_')[1];
     const caseDoc = await CaseModel.findById(caseId).populate<{
       items: (CaseItem & {
         item: Item;

@@ -114,7 +114,7 @@ class ViewInventory implements IFeature<ButtonInteraction> {
         path: 'item',
       },
     });
-    console.log(inventory);
+
     const inventoryItems = inventory
       .map((item) => `${item.item.name} - Quantity: ${item.quantity}`)
       .join('\n');
