@@ -2,7 +2,9 @@ import {
   BotClient,
   IEvent,
   logger,
-  RoomUserModel,
+  UserModel,
+  getXPForLevel,
+  hasReachedMaxXP,
 } from '@lolz-bots/shared';
 import { VoiceState } from 'discord.js';
 
@@ -12,58 +14,72 @@ export default class VoiceStateUpdateEvent implements IEvent {
   name = 'voiceStateUpdate';
 
   async run(client: BotClient, oldState: VoiceState, newState: VoiceState) {
-    const userId = newState.member?.id || oldState.member?.id;
-    if (!userId) return;
-
-    const startTracking = () => {
+    const init = async () => {
       const joinedAt = new Date().getTime();
-      voiceMemory.set(userId, joinedAt);
+      logger.info(`User ${newState.member!.id} joined voice at ${joinedAt}`);
+      voiceMemory.set(newState.member!.id, joinedAt);
     };
 
-    const saveOnline = async () => {
+    const save = async () => {
       try {
-        const joinedAt = voiceMemory.get(userId);
+        const joinedAt = voiceMemory.get(oldState.member!.id);
         if (!joinedAt) return;
 
-        const roomUser = await RoomUserModel.findOne({ userId: userId });
-        if (!roomUser) return;
-
         const time = Math.round(Date.now() - joinedAt);
-        roomUser.online = (roomUser.online || 0) + time;
-        await roomUser.save();
+        logger.info(`User ${oldState.member!.id} left voice after ${time} ms`);
+        let user = await UserModel.findOne({ discordID: oldState.member!.id }) || await UserModel.create({ discordID: oldState.member!.id });
+
+        const minutesSpent = Math.floor(time / 60000);
+        if (minutesSpent > 0) {
+          user.coins += minutesSpent;
+
+          if (!hasReachedMaxXP(user.xp, user.level)) {
+            const xpPerMinute = 1 + (user.level - 1) * 0.1;
+            const rawXP = minutesSpent * xpPerMinute;
+            const xpEarned = Math.ceil(rawXP);
+            
+            const maxXP = getXPForLevel(user.level);
+            const xpToAdd = Math.min(xpEarned, maxXP - user.xp);
+            user.xp += xpToAdd;
+          }
+        }
+
+        user.online = time;
+        await user.save();
+
+        logger.info(`User ${user}.`);
       } catch (error) {
         logger.error('Error saving user data:', error);
       }
     };
 
-    const clearTracking = () => {
-      voiceMemory.delete(userId);
+    const clear = () => {
+      voiceMemory.delete(oldState.member!.id);
     };
 
     if (!oldState.channel && newState.channel) {
-      startTracking();
-    }
-
-    else if (oldState.channel && !newState.channel) {
-      await saveOnline();
-      clearTracking();
-    }
-
-    else if (oldState.channel && !oldState.selfDeaf && newState.selfDeaf) {
-      await saveOnline();
-      clearTracking();
-    }
-
-    else if (oldState.channel && oldState.selfDeaf && !newState.selfDeaf) {
-      startTracking();
-    }
-    else if (
+      await init();
+    } else if (oldState.channel && !newState.channel) {
+      await save();
+      clear();
+    } else if (oldState.channel && !oldState.selfDeaf && newState.selfDeaf) {
+      await save();
+      clear();
+    } else if (oldState.channel && oldState.selfDeaf && !newState.selfDeaf) {
+      await init();
+    } else if (oldState.channel && !oldState.selfMute && newState.selfMute) {
+      await save();
+      await init();
+    } else if (oldState.channel && oldState.selfMute && !newState.selfMute) {
+      await save();
+      await init();
+    } else if (
       oldState.channel &&
       newState.channel &&
       oldState.channel.id !== newState.channel.id
     ) {
-      await saveOnline();
-      startTracking();
+      await save();
+      await init();
     }
   }
 }

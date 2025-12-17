@@ -40,7 +40,7 @@ export class User extends TimeStamps implements Base {
   @Prop({ default: null })
   timelyBonusClaimedAt!: Date | null;
 
-  @Prop({ default: 0 })
+  @Prop({ default: 1 })
   level!: number;
 
   @Prop({ default: 0 })

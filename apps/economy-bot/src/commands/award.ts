@@ -8,7 +8,9 @@ import {
   RunCommandParams,
   RunFeatureParams,
   UserModel,
-  logger
+  logger,
+  getXPForLevel,
+  hasReachedMaxXP,
 } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
@@ -36,27 +38,63 @@ export default class Award implements ICommand {
       name: 'coins',
       description: 'Количество монет для выдачи',
       type: ApplicationCommandOptionType.Number,
-      required: true,
+      required: false,
+    },
+    {
+      name: 'lvl',
+      description: 'Количество уровней для выдачи',
+      type: ApplicationCommandOptionType.Number,
+      required: false,
     }
   ];
 
   async run({ interaction }: RunCommandParams) {
     const user = interaction.options.getUser('user')
     const coins = interaction.options.getNumber('coins')
+    const lvl = interaction.options.getNumber('lvl')
 
-    if(!user || !coins) {
-      return interaction.reply({ content: 'Не удалось получить данные, обратитесь в поддержку.', ephemeral: true });
+    if(!user) {
+      return interaction.reply({ content: 'Не удалось получить пользователя, обратитесь в поддержку.', ephemeral: true });
     }
 
-    const userProfile = await UserModel.findOne({ discordID: user.id }) || await UserModel.create({ discordID: user.id })
-    userProfile.coins += coins
+    if (!coins && !lvl) {
+      return interaction.reply({ content: 'Укажите хотя бы один параметр: coins или lvl.', ephemeral: true });
+    }
+
+    const userProfile = await UserModel.findOne({ discordID: user.id }) || await UserModel.create({ discordID: user.id, level: 1 })
+    
+    const fields: { name: string; value: string; inline: boolean }[] = [];
+
+    if (coins) {
+      userProfile.coins += coins
+      fields.push({ name: 'Количество монет', value: `${coins}`, inline: true });
+    }
+
+    if (lvl) {
+      const newLevel = Math.min(userProfile.level + lvl, 50);
+      const actualLvlAdded = newLevel - userProfile.level;
+      
+      userProfile.level = newLevel;
+      userProfile.xp = 0;
+      
+      fields.push({ name: 'Количество уровней', value: `${actualLvlAdded}`, inline: true });
+      
+      if (actualLvlAdded < lvl) {
+        fields.push({ 
+          name: 'Предупреждение', 
+          value: `Было выдано только ${actualLvlAdded} уровней из ${lvl}, так как достигнут максимальный уровень (50).`, 
+          inline: false 
+        });
+      }
+    }
+
     await userProfile.save()
 
     const logsEmbed = new EmbedBuilder()
-      .setTitle(`Выдача монет`)
+      .setTitle(`Выдача наград`)
       .addFields(
         { name: 'Пользователь', value: `<@${user.id}>`, inline: true },
-        { name: 'Количество монет', value: `${coins}`, inline: true },
+        ...fields,
         { name: 'Выдал', value: `<@${interaction.user.id}>`, inline: true },
       );
 
@@ -71,6 +109,11 @@ export default class Award implements ICommand {
       await logsChannel.send({ embeds: [logsEmbed] });
     }
 
-    return interaction.reply({ content: `Выдано ${coins} монет пользователю <@${user.id}>.`, ephemeral: true });
+    let responseMessage = '';
+    if (coins) responseMessage += `${coins} монет`;
+    if (coins && lvl) responseMessage += ' и ';
+    if (lvl) responseMessage += `${lvl} уровней`;
+
+    return interaction.reply({ content: `Выдано ${responseMessage} пользователю <@${user.id}>.`, ephemeral: true });
   }
 }

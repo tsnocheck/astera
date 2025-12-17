@@ -51,9 +51,7 @@ export default class Blackjack implements ICommand {
 
   async run({ interaction }: RunCommandParams) {
     const bet = interaction.options.getNumber('bet');
-    const userProfile =
-      (await UserModel.findOne({ discordID: interaction.user.id })) ||
-      (await UserModel.create({ discordID: interaction.user.id }));
+    const userProfile = await UserModel.findOne({ discordID: interaction.user.id }) || await UserModel.create({ discordID: interaction.user.id });
 
     if (!bet) {
       return interaction.reply({
@@ -115,11 +113,11 @@ export default class Blackjack implements ICommand {
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('blackjack_hit')
-        .setLabel('Взять карту (Hit)')
+        .setLabel('Взять карту')
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId('blackjack_stand')
-        .setLabel('Хватит (Stand)')
+        .setLabel('Хватит')
         .setStyle(ButtonStyle.Secondary),
     );
 
@@ -280,11 +278,11 @@ class BlackjackButtons implements IFeature<ButtonInteraction> {
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('blackjack_hit')
-        .setLabel('Взять карту (Hit)')
+        .setLabel('Взять карту')
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId('blackjack_stand')
-        .setLabel('Хватит (Stand)')
+        .setLabel('Хватит')
         .setStyle(ButtonStyle.Secondary),
     );
 

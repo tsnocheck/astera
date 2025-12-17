@@ -26,15 +26,15 @@ export default class Shop implements ICommand {
 
   async run({ interaction }: RunCommandParams) {
     const embed = constructEmbed({
-      title: 'Shop',
+      title: 'Магазин',
       description:
-        'Welcome to the shop! Here you can buy items to enhance your experience.',
+        'Добро пожаловать в магазин! Здесь вы можете приобрести предметы.',
       customType: 'info',
     });
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('cases')
-        .setLabel('Show cases')
+        .setLabel('Показать кейсы')
         .setStyle(ButtonStyle.Primary),
     );
 
@@ -52,15 +52,15 @@ class ShowCases implements IFeature<ButtonInteraction> {
 
   async run({ interaction }: RunFeatureParams<ButtonInteraction>) {
     const embed = constructEmbed({
-      title: 'Cases',
+      title: 'Кейсы',
       description:
-        'Here are the available cases you can purchase. Each case contains a random item.',
+        'Доступные кейсы для покупки. Каждый кейс содержит случайный предмет.',
       customType: 'info',
     });
 
     const cases = await CaseModel.find();
     if (!cases || cases.length === 0) {
-      embed.setDescription('No cases available at the moment.');
+      embed.setDescription('В данный момент нет доступных кейсов.');
       await interaction.reply({
         embeds: [embed],
         ephemeral: true,
@@ -77,7 +77,7 @@ class ShowCases implements IFeature<ButtonInteraction> {
       row.addComponents(
         new ButtonBuilder()
           .setCustomId(`buy-case_${c.id}`)
-          .setLabel(`Open ${c.name}`)
+          .setLabel(`Открыть ${c.name}`)
           .setStyle(ButtonStyle.Success),
       );
     });
@@ -104,7 +104,7 @@ class BuyCase implements IFeature<ButtonInteraction> {
     });
     if (!caseDoc) {
       await interaction.reply({
-        content: 'Case not found.',
+        content: 'Кейс не найден.',
         ephemeral: true,
       });
       return;
@@ -123,8 +123,8 @@ class BuyCase implements IFeature<ButtonInteraction> {
         ephemeral: true,
         embeds: [
           constructEmbed({
-            title: 'Insufficient Coins',
-            description: `You need ${caseDoc.price} coins to buy this case, but you only have ${user.coins} coins.`,
+            title: 'Недостаточно монет',
+            description: `Для покупки этого кейса нужно ${caseDoc.price} монет, а у вас только ${user.coins} монет.`,
             customType: 'error',
           }),
         ],

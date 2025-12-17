@@ -11,6 +11,8 @@ export * from './lib/services/logger';
 export * from './lib/services/locale';
 export * from './lib/services/send-telegram';
 export * from './lib/services/construct-embed';
+export * from './lib/services/formatTime';
+export * from './lib/services/levelSystem';
 
 export * from './lib/models/User';
 export * from './lib/models/Punishments';

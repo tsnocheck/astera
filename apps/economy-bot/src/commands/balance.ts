@@ -38,7 +38,7 @@ export default class Balance implements ICommand {
       title: `Баланс ${user.username}`,
       fields: [
         {
-          name: 'Balance',
+          name: 'Баланс',
           value: `${userProfile.coins} LOLZ`,
           inline: true,
         },

@@ -51,9 +51,7 @@ export default class Roulette implements ICommand {
     const bet = interaction.options.getNumber('bet');
     const type = interaction.options.getString('type');
     const chosenNumber = interaction.options.getInteger('number');
-    const userProfile =
-      (await UserModel.findOne({ discordID: interaction.user.id })) ||
-      (await UserModel.create({ discordID: interaction.user.id }));
+    const userProfile = await UserModel.findOne({ discordID: interaction.user.id }) || await UserModel.create({ discordID: interaction.user.id });
 
     if (!bet) {
       return interaction.reply({

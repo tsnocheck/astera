@@ -32,9 +32,7 @@ export default class Coinflip implements ICommand {
   async run({ interaction }: RunCommandParams) {
     const bet = interaction.options.getNumber('bet');
     const choice = interaction.options.getString('choice');
-    const userProfile =
-      (await UserModel.findOne({ discordID: interaction.user.id })) ||
-      (await UserModel.create({ discordID: interaction.user.id }));
+    const userProfile = await UserModel.findOne({ discordID: interaction.user.id }) || await UserModel.create({ discordID: interaction.user.id });
 
     if (!bet) {
       return interaction.reply({

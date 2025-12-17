@@ -25,8 +25,7 @@ export default class Slots implements ICommand {
 
   async run({ interaction }: RunCommandParams) {
     const bet = interaction.options.getNumber('bet');
-    const userProfile = await UserModel.findOne({ discordID: interaction.user.id }) || 
-                        await UserModel.create({ discordID: interaction.user.id });
+    const userProfile = await UserModel.findOne({ discordID: interaction.user.id }) || await UserModel.create({ discordID: interaction.user.id });
 
     if (!bet) {
       return interaction.reply({ content: 'Не удалось получить ставку, обратитесь в поддержку.', ephemeral: true });
