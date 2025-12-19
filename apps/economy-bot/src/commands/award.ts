@@ -9,8 +9,6 @@ import {
   RunFeatureParams,
   UserModel,
   logger,
-  getXPForLevel,
-  hasReachedMaxXP,
 } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,

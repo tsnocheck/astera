@@ -8,9 +8,8 @@ import {
   UserInventoryItem,
   UserModel,
   getXPForLevel,
-  getLevelUpCost,
-  hasReachedMaxXP,
   getLevelProgress,
+  getCoinBonus,
   formatTime,
 } from '@lolz-bots/shared';
 import {
@@ -36,7 +35,7 @@ export default class Profile implements ICommand {
     },
   ];
 
-  features = [new ViewInventory(), new LevelUp()];
+  features = [new ViewInventory()];
 
   async run({ interaction }: RunCommandParams) {
     const user = interaction.options.getUser('user') || interaction.user;
@@ -52,8 +51,7 @@ export default class Profile implements ICommand {
 
     const maxXP = getXPForLevel(userProfile.level);
     const progress = getLevelProgress(userProfile.xp, userProfile.level);
-    const canLevelUp = hasReachedMaxXP(userProfile.xp, userProfile.level) && userProfile.level < 50;
-    const levelUpCost = getLevelUpCost(userProfile.level);
+    const coinBonus = getCoinBonus(userProfile.level);
 
     const embed = constructEmbed({
       title: `${user.username}'s Profile`,
@@ -75,6 +73,11 @@ export default class Profile implements ICommand {
           inline: false,
         },
         {
+          name: 'Бонус к монетам',
+          value: `x${coinBonus.toFixed(1)} за минуту в войсе`,
+          inline: true,
+        },
+        {
           name: 'Время в войсе',
           value: formatTime(userProfile.online),
           inline: true,
@@ -91,23 +94,11 @@ export default class Profile implements ICommand {
           .setLabel('Инвентарь')
           .setStyle(ButtonStyle.Secondary),
       );
-
-      if (canLevelUp) {
-        profileOptions.addComponents(
-          new ButtonBuilder()
-            .setCustomId('profile-levelup')
-            .setLabel('Купить уровень')
-            .setStyle(ButtonStyle.Success),
-        );
-        
-        embed.setFooter({ text: `Стоимость повышения: ${levelUpCost} LOLZ` });
-      }
     }
 
     await interaction.reply({
       embeds: [embed],
-      components: [profileOptions],
-      ephemeral: true,
+      components: userProfile.discordID === interaction.user.id ? [profileOptions] : [],
     });
   }
 }
@@ -162,94 +153,6 @@ class ViewInventory implements IFeature<ButtonInteraction> {
     await interaction.reply({
       embeds: [embed],
       ephemeral: true,
-    });
-  }
-}
-
-class LevelUp implements IFeature<ButtonInteraction> {
-  name = 'profile-levelup';
-
-  async run({ interaction }: RunFeatureParams<ButtonInteraction>) {
-    let userProfile = await UserModel.findOne({ discordID: interaction.user.id }) || await UserModel.create({ discordID: interaction.user.id });
-
-    if (!hasReachedMaxXP(userProfile.xp, userProfile.level)) {
-      await interaction.reply({
-        ephemeral: true,
-        embeds: [
-          constructEmbed({
-            title: 'Невозможно повысить уровень',
-            description: 'Сначала нужно набрать максимальное количество XP для текущего уровня!',
-            customType: 'error',
-          }),
-        ],
-      });
-      return;
-    }
-
-    if (userProfile.level >= 50) {
-      await interaction.reply({
-        ephemeral: true,
-        embeds: [
-          constructEmbed({
-            title: 'Максимальный уровень достигнут',
-            description: 'Вы уже достигли максимального уровня!',
-            customType: 'info',
-          }),
-        ],
-      });
-      return;
-    }
-
-    const levelUpCost = getLevelUpCost(userProfile.level);
-
-    if (userProfile.coins < levelUpCost) {
-      await interaction.reply({
-        ephemeral: true,
-        embeds: [
-          constructEmbed({
-            title: 'Недостаточно средств',
-            description: `Для повышения уровня нужно ${levelUpCost} LOLZ. У вас только ${userProfile.coins} LOLZ.`,
-            customType: 'error',
-          }),
-        ],
-      });
-      return;
-    }
-
-    userProfile.coins -= levelUpCost;
-    userProfile.level += 1;
-    userProfile.xp = 0;
-
-    await userProfile.save();
-
-    const newMaxXP = getXPForLevel(userProfile.level);
-
-    await interaction.reply({
-      ephemeral: true,
-      embeds: [
-        constructEmbed({
-          title: '🎉 Повышение уровня!',
-          description: `Поздравляем! Вы достигли ${userProfile.level} уровня!`,
-          fields: [
-            {
-              name: 'Новый уровень',
-              value: `${userProfile.level}`,
-              inline: true,
-            },
-            {
-              name: 'Требуется XP',
-              value: `${newMaxXP} XP`,
-              inline: true,
-            },
-            {
-              name: 'Остаток',
-              value: `${userProfile.coins} LOLZ`,
-              inline: true,
-            },
-          ],
-          customType: 'success',
-        }),
-      ],
     });
   }
 }

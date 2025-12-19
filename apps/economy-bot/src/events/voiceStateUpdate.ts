@@ -4,7 +4,7 @@ import {
   logger,
   UserModel,
   getXPForLevel,
-  hasReachedMaxXP,
+  getCoinBonus,
 } from '@lolz-bots/shared';
 import { VoiceState } from 'discord.js';
 
@@ -31,16 +31,24 @@ export default class VoiceStateUpdateEvent implements IEvent {
 
         const minutesSpent = Math.floor(time / 60000);
         if (minutesSpent > 0) {
-          user.coins += minutesSpent;
+          const coinBonus = getCoinBonus(user.level);
+          const coinsEarned = Math.floor(minutesSpent * coinBonus);
+          user.coins += coinsEarned;
+          
+          user.xp += minutesSpent;
 
-          if (!hasReachedMaxXP(user.xp, user.level)) {
-            const xpPerMinute = 1 + (user.level - 1) * 0.1;
-            const rawXP = minutesSpent * xpPerMinute;
-            const xpEarned = Math.ceil(rawXP);
-            
-            const maxXP = getXPForLevel(user.level);
-            const xpToAdd = Math.min(xpEarned, maxXP - user.xp);
-            user.xp += xpToAdd;
+          while (user.level < 50) {
+            const requiredXP = getXPForLevel(user.level);
+            if (user.xp >= requiredXP) {
+              user.xp -= requiredXP;
+              user.level += 1;
+            } else {
+              break;
+            }
+          }
+
+          if (user.level >= 50) {
+            user.xp = Math.min(user.xp, getXPForLevel(50));
           }
         }
 
