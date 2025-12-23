@@ -1,20 +1,15 @@
-import { IFeature, logger, RunFeatureParams } from '@lolz-bots/shared';
+import { 
+  IFeature, 
+  logger, 
+  RunFeatureParams,
+  RoomModel, 
+  RoomUserModel,
+} from '@lolz-bots/shared';
 import {
-  ActionRowBuilder,
-  Base,
-  BaseChannel,
-  ButtonInteraction,
   ChannelType,
-  Guild,
-  GuildBasedChannel,
-  GuildChannel,
-  GuildChannelTypes,
   PermissionFlagsBits,
   SelectMenuInteraction,
-  StringSelectMenuBuilder,
-  VoiceChannel,
 } from 'discord.js';
-import { RoomModel, RoomUserModel, RoomUser } from '@lolz-bots/shared';
 
 export class SelectRoom implements IFeature<SelectMenuInteraction> {
   name = 'selectRoom';

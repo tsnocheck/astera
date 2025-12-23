@@ -1,11 +1,9 @@
-import { constructEmbed, IFeature, RunFeatureParams } from '@lolz-bots/shared';
+import { constructEmbed, IFeature, RunFeatureParams, RoomModel } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
   ButtonInteraction,
   StringSelectMenuBuilder,
-  UserSelectMenuBuilder,
 } from 'discord.js';
-import { RoomModel, RoomUserModel } from '@lolz-bots/shared';
 
 export class MuteOrUnmute implements IFeature<ButtonInteraction> {
   name = 'muteOrUnMute';

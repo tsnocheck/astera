@@ -1,11 +1,10 @@
-import { constructEmbed, IFeature, logger, RoomUser, RunFeatureParams } from '@lolz-bots/shared';
+import { RoomModel, IFeature, RunFeatureParams } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
   ButtonInteraction,
   StringSelectMenuBuilder,
   UserSelectMenuBuilder,
 } from 'discord.js';
-import { RoomModel, RoomUserModel } from '@lolz-bots/shared';
 
 export class SetLimits implements IFeature<ButtonInteraction> {
   name = 'setLimits';

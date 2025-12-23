@@ -1,8 +1,8 @@
-import { IFeature, RunFeatureParams, RoomModel} from '@lolz-bots/shared';
+import { IFeature, PrivateModel, RunFeatureParams } from '@lolz-bots/shared';
 import { ChannelType, ModalSubmitInteraction } from 'discord.js';
 
-export class SetLimitRoomModal implements IFeature<ModalSubmitInteraction> {
-  name = 'setLimitRoomModal';
+export class SetLimitPrivateModal implements IFeature<ModalSubmitInteraction> {
+  name = 'setLimitPrivateModal';
 
   async run({ interaction }: RunFeatureParams<ModalSubmitInteraction>) {
     const roomLimitValue = interaction.fields.getTextInputValue('roomLimitInput');
@@ -17,7 +17,7 @@ export class SetLimitRoomModal implements IFeature<ModalSubmitInteraction> {
     }
 
     const roomId = interaction.customId.split('_')[1];
-    const room = await RoomModel.findOne({ _id: roomId });
+    const room = await PrivateModel.findOne({ _id: roomId });
 
     if (!room) {
       return interaction.reply({
@@ -32,13 +32,6 @@ export class SetLimitRoomModal implements IFeature<ModalSubmitInteraction> {
       return interaction.reply({
         content: 'Голосовой канал не найден.',
         ephemeral: true,
-        components: [],
-      });
-    }
-
-    if(room.ownerId !== interaction.user.id && !room.coOwners.includes(interaction.user.id)) {
-      return interaction.reply({
-        content: 'У вас нет прав для установки лимита в этой комнате.',
         components: [],
       });
     }
@@ -58,4 +51,4 @@ export class SetLimitRoomModal implements IFeature<ModalSubmitInteraction> {
   }
 }
 
-export default SetLimitRoomModal;
+export default SetLimitPrivateModal;

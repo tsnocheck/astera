@@ -2,10 +2,11 @@ import {
   BotClient,
   IEvent,
   logger,
+  PrivateModel,
   RoomModel,
   RoomUserModel,
 } from '@lolz-bots/shared';
-import { VoiceState, VoiceChannel } from 'discord.js';
+import { VoiceState, VoiceChannel, ChannelType, PermissionFlagsBits } from 'discord.js';
 
 const voiceMemory = new Map<string, number>();
 
@@ -14,8 +15,54 @@ export default class VoiceStateUpdateEvent implements IEvent {
 
   async run(client: BotClient, oldState: VoiceState, newState: VoiceState) {
     const parentRoomId = process.env.PARENT_ROOM_ID;
+    const parentPrivateId = process.env.PARENT_PRIVATE_ID;
+    const createPrivateRooms = process.env.CREATE_PRIVATE_CHANNEL_ID
 
-    if (oldState.channel?.parentId === parentRoomId && oldState.channel) {
+    if (newState.channelId === createPrivateRooms) {
+      try {
+        const guild = newState.guild;
+        const member = newState.member;
+        
+        if (!member || !guild) return;
+
+        let privateModel = await PrivateModel.findOne({ ownerId: member.id }) || await PrivateModel.create({ ownerId: member.id })
+        const channel = guild.channels.cache.get(privateModel.roomId!);
+
+        if(!channel){ 
+          const privateChannel = await guild.channels.create({
+            name: privateModel.name || `${member.user.username}'s room`,
+            type: ChannelType.GuildVoice,
+            parent: parentPrivateId,
+            permissionOverwrites: [
+              {
+                id: member.id,
+                allow: [
+                  PermissionFlagsBits.ManageChannels,
+                  PermissionFlagsBits.MoveMembers,
+                  PermissionFlagsBits.MuteMembers,
+                ],
+              },
+              {
+                id: guild.id,
+                allow: [PermissionFlagsBits.Connect, PermissionFlagsBits.ViewChannel],
+              },
+            ],
+          });
+
+          await member.voice.setChannel(privateChannel.id);
+          privateModel.roomId = privateChannel.id;
+          await privateModel.save();
+        }
+        if (channel && channel.type === ChannelType.GuildVoice) {
+          await member.voice.setChannel(channel.id);
+          return;
+        }
+      } catch (error) {
+        logger.error('Error creating private room:', error);
+      }
+    }
+
+    if (oldState.channel && (oldState.channel.parentId === parentRoomId || oldState.channel.parentId === parentPrivateId)) {
       const channel = oldState.guild.channels.cache.get(
         oldState.channel.id,
       ) as VoiceChannel;

@@ -1,11 +1,9 @@
-import { constructEmbed, IFeature, logger, RunFeatureParams } from '@lolz-bots/shared';
+import { RoomModel, IFeature, RunFeatureParams } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
   ButtonInteraction,
   StringSelectMenuBuilder,
-  UserSelectMenuBuilder,
 } from 'discord.js';
-import { RoomModel, RoomUserModel } from '@lolz-bots/shared';
 
 export class InviteRoom implements IFeature<ButtonInteraction> {
   name = 'inviteRoom';

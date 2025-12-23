@@ -1,10 +1,9 @@
-import { IFeature, logger, Room, RoomUser, RunFeatureParams } from '@lolz-bots/shared';
+import { IFeature, RoomModel, RunFeatureParams } from '@lolz-bots/shared';
 import {
   ActionRowBuilder,
   ButtonInteraction,
   StringSelectMenuBuilder,
 } from 'discord.js';
-import { RoomModel, RoomUserModel } from '@lolz-bots/shared';
 
 export class ReNameRoom implements IFeature<ButtonInteraction> {
   name = 'reName';
