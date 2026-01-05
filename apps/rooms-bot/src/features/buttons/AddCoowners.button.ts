@@ -36,7 +36,7 @@ export class AddCoOwner implements IFeature<ButtonInteraction> {
       title: 'Управление комнатой',
       description:
           'Выберите комнату для добавления совладельца.',
-      customType: 'info',
+      customType: 'custom',
     });
     
     await interaction.reply({

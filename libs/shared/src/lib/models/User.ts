@@ -8,15 +8,7 @@ import {
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 import { Types } from 'mongoose';
 import { Item, ItemModel } from './Item';
-
-@modelOptions({ schemaOptions: { _id: false } })
-export class UserInventoryItem {
-  @Prop({ ref: () => ItemModel.modelName, required: true })
-  public item!: Ref<Item>;
-
-  @Prop({ required: true, default: 1 })
-  public quantity!: number;
-}
+import { RolesShop } from './RolesShop';
 
 @index({ discordID: 1 }, { unique: true })
 export class User extends TimeStamps implements Base {
@@ -25,17 +17,11 @@ export class User extends TimeStamps implements Base {
   @Prop({ required: true })
   discordID!: string;
 
-  @Prop()
-  lolzID?: string;
-
   @Prop({ default: 0 })
   coins!: number;
 
   @Prop({ default: 0 })
   xp!: number;
-
-  @Prop({ default: false, required: true })
-  verified!: boolean;
 
   @Prop({ default: null })
   timelyBonusClaimedAt!: Date | null;
@@ -47,10 +33,10 @@ export class User extends TimeStamps implements Base {
   online!: number;
 
   @Prop({ default: 0 })
-  prestige!: number;
+  message!: number;
 
-  @Prop({ type: () => [UserInventoryItem], default: [] })
-  inventory!: UserInventoryItem[];
+  @Prop({ type: () => [RolesShop], default: [] })
+  roles!: RolesShop[];
 }
 
 export const UserModel = getModelForClass(User, {

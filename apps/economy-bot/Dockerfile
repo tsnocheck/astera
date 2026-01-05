@@ -31,5 +31,6 @@ COPY apps/economy-bot/package.json ./apps/economy-bot/
 RUN yarn workspaces focus --all --production
 COPY --from=builder /app/apps/economy-bot/dist ./apps/economy-bot/dist
 COPY --from=builder /app/libs/shared/dist ./libs/shared/dist
+COPY --from=builder /app/apps/economy-bot/src/etc ./apps/economy-bot/dist/etc
 
 CMD ["yarn", "workspace", "economy-bot", "start"]

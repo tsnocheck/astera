@@ -3,12 +3,14 @@
   "packageManager": "yarn@4.9.1",
   "dependencies": {
     "@lolz-bots/shared": "1.0.0",
+    "@napi-rs/canvas": "^0.1.88",
     "discord-api-types": "^0.38.15",
     "discord.js": "^14.21.0",
     "kafkajs": "^2.2.4",
     "node-cron": "^4.2.0"
   },
   "devDependencies": {
+    "@types/node": "^25.0.3",
     "typescript": "^5.8.3"
   },
   "scripts": {

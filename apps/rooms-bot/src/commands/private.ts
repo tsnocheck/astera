@@ -13,38 +13,38 @@ export default class CreateRooms implements ICommand {
     const buttonRow1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('transferOwnerPrivate')
-        .setEmoji('👤')
+        .setEmoji('<:4_:1457026014516478155>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('accessControlPrivate')
-        .setEmoji('🚫')
+        .setEmoji('<:5_:1457026017473462452>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('setLimitsPrivate')
-        .setEmoji('👥')
+        .setEmoji('<:3_:1457026011458703573>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('lockRoomPrivate')
-        .setEmoji('🔒')
+        .setEmoji('<:1_:1457026008187142257>')
         .setStyle(ButtonStyle.Secondary),
     );
 
     const buttonRow2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('reNamePrivate')
-        .setEmoji('✏️')
+        .setEmoji('<:7_:1457026020371595293>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('hideRoomPrivate')
-        .setEmoji('🙈')
+        .setEmoji('<:6_:1457026018962444503>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('kickUserPrivate')
-        .setEmoji('👢')
+        .setEmoji('<:2_:1457026009621725374>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('muteOrUnMutePrivate')
-        .setEmoji('🗣️')
+        .setEmoji('<:8_:1457026022334664816>')
         .setStyle(ButtonStyle.Secondary),
     );
 
@@ -63,16 +63,16 @@ export default class CreateRooms implements ICommand {
       description: `
       Измените конфигурацию вашей комнаты с помощью панели управления.
       
-      👤 — назначить нового создателя комнаты
-      🚫 — ограничить/выдать доступ к комнате
-      👥 — задать новый лимит участников
-      🔒 — закрыть/открыть комнату
-      ✏️ — изменить название комнаты
-      🙈 — скрыть/открыть комнату
-      👢 — выгнать участника из комнаты
-      🗣️ — ограничить/выдать право говорить
+      <:4_:1457026014516478155> — назначить нового создателя комнаты
+      <:5_:1457026017473462452> — ограничить/выдать доступ к комнате
+      <:3_:1457026011458703573> — задать новый лимит участников
+      <:1_:1457026008187142257> — закрыть/открыть комнату
+      <:7_:1457026020371595293> — изменить название комнаты
+      <:6_:1457026018962444503> — скрыть/открыть комнату
+      <:2_:1457026009621725374> — выгнать участника из комнаты
+      <:8_:1457026022334664816> — ограничить/выдать право говорить
       `,
-      customType: 'info',
+      customType: 'custom',
     });
 
     await channel.send({

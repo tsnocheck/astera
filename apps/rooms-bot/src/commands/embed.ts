@@ -13,23 +13,23 @@ export default class CreateRooms implements ICommand {
     const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('inviteRoom')
-        .setEmoji('<:invite:1438555700275183726>')
+        .setEmoji('<:invite:1457028502208512021>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('muteOrUnMute')
-        .setEmoji('<:mute:1438555706063196191>')
+        .setEmoji('<:mute:1457026940442509405>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('addCoOwner')
-        .setEmoji('<:coowner:1438555703168995491>')
+        .setEmoji('<:crown:1457026936978276444>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('setLimits')
-        .setEmoji('<:limits:1438555707854159882>')
+        .setEmoji('<:limits:1457026938517586103>')
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
         .setCustomId('reName')
-        .setEmoji('<:rename:1438555701759836230>')
+        .setEmoji('<:Vector:1457026942845849815>')
         .setStyle(ButtonStyle.Secondary),
     );
 
@@ -60,17 +60,17 @@ export default class CreateRooms implements ICommand {
     const embed = constructEmbed({
       title: 'Панель управления',
       description: `
-      <:invite:1438555700275183726> - Пригласить/Удалить участников
-      <:mute:1438555706063196191> - Выдать/Снять мут участнику
-      <:coowner:1438555703168995491> - Добавить/Удалить совладельца
-      <:limits:1438555707854159882> - Установить лимиты участников
-      <:rename:1438555701759836230> - Переименовать комнату
+      <:invite:1457028502208512021> - Пригласить/Удалить участников
+      <:mute:1457026940442509405> - Выдать/Снять мут участнику
+      <:crown:1457026936978276444> - Добавить/Удалить совладельца
+      <:limits:1457026938517586103> - Установить лимиты участников
+      <:Vector:1457026942845849815> - Переименовать комнату
       ㅤ
       Нажмите на кнопку "Онлайн комнаты", чтобы просмотреть статистику онлайн по вашей комнате.
       ㅤ
       Нажмите на кнопку "Создать", чтобы создать новую приватную комнату.
       `,
-      customType: 'info',
+      customType: 'custom',
     });
 
     await channel.send({

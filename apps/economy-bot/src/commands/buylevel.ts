@@ -51,7 +51,7 @@ export default class BuyLevel implements ICommand {
           constructEmbed({
             title: 'Максимальный уровень достигнут',
             description: 'Вы уже достигли максимального уровня (50)!',
-            customType: 'info',
+            customType: 'custom',
           }),
         ],
       });
@@ -89,7 +89,7 @@ export default class BuyLevel implements ICommand {
           inline: false,
         },
       ],
-      customType: 'info',
+      customType: 'custom',
     });
 
     const row = new ActionRowBuilder<ButtonBuilder>()
@@ -175,7 +175,7 @@ class IncreaseLevelCount implements IFeature<ButtonInteraction> {
           inline: false,
         },
       ],
-      customType: 'info',
+      customType: 'custom',
     });
 
     const row = new ActionRowBuilder<ButtonBuilder>()
@@ -252,7 +252,7 @@ class DecreaseLevelCount implements IFeature<ButtonInteraction> {
           inline: false,
         },
       ],
-      customType: 'info',
+      customType: 'custom',
     });
 
     const row = new ActionRowBuilder<ButtonBuilder>()

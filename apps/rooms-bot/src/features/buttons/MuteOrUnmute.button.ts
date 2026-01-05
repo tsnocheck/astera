@@ -35,7 +35,7 @@ export class MuteOrUnmute implements IFeature<ButtonInteraction> {
     const embed = constructEmbed({
       title: 'Управление комнатой',
       description: 'Выберите пользователей для выдачи или снятия мута в вашей комнате.',
-      customType: 'info',
+      customType: 'custom',
     });
 
     await interaction.reply({

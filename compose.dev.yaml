@@ -21,6 +21,28 @@ services:
       - bridge
     depends_on:
       - mongo
+  close-bot:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: apps/close-bot/Dockerfile
+    env_file:
+      - .env.close
+    networks:
+      - bridge
+    depends_on:
+      - mongo
+  backup-bot:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: apps/backup-bot/Dockerfile
+    env_file:
+      - .env.backup
+    networks:
+      - bridge
+    depends_on:
+      - mongo
   mongo:
     image: mongo:latest
     restart: unless-stopped

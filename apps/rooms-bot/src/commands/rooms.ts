@@ -5,7 +5,6 @@ import {
   Item,
   RunCommandParams,
   RunFeatureParams,
-  UserInventoryItem,
   UserModel,
 } from '@lolz-bots/shared';
 import {

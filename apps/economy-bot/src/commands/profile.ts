@@ -1,27 +1,20 @@
 import {
-  constructEmbed,
   ICommand,
-  IFeature,
-  Item,
   RunCommandParams,
-  RunFeatureParams,
-  UserInventoryItem,
   UserModel,
-  getXPForLevel,
-  getLevelProgress,
-  getCoinBonus,
-  formatTime,
+  MarryModel,
+  logger,
 } from '@lolz-bots/shared';
 import {
-  ActionRowBuilder,
   ApplicationCommandOptionData,
-  ButtonBuilder,
-  ButtonInteraction,
+  AttachmentBuilder,
 } from 'discord.js';
 import {
   ApplicationCommandOptionType,
-  ButtonStyle,
 } from 'discord-api-types/v10';
+import { createCanvas, loadImage, GlobalFonts } from '@napi-rs/canvas';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
 export default class Profile implements ICommand {
   name = 'profile';
@@ -35,9 +28,9 @@ export default class Profile implements ICommand {
     },
   ];
 
-  features = [new ViewInventory()];
-
   async run({ interaction }: RunCommandParams) {
+    await interaction.deferReply();
+    
     const user = interaction.options.getUser('user') || interaction.user;
 
     let userProfile = await UserModel.findOne({ discordID: user.id });
@@ -49,110 +42,164 @@ export default class Profile implements ICommand {
       await userProfile.save();
     }
 
-    const maxXP = getXPForLevel(userProfile.level);
-    const progress = getLevelProgress(userProfile.xp, userProfile.level);
-    const coinBonus = getCoinBonus(userProfile.level);
+    const avatarURL = user.displayAvatarURL({ extension: 'png', size: 512 });
+    const guildName = interaction.guild?.name;
+    
+    // Проверяем наличие брака
+    const marriage = await MarryModel.findOne({
+      $or: [{ user1: user.id }, { user2: user.id }],
+    });
+    
+    let partnerUser = null;
+    if (marriage) {
+      const partnerId = marriage.user1 === user.id ? marriage.user2 : marriage.user1;
+      try {
+        partnerUser = await interaction.client.users.fetch(partnerId);
+      } catch (error) {
+        console.error('Failed to fetch partner user:', error);
+      }
+    }
+    
+    try {
+      // Получаем топ по онлайну
+      const allUsers = await UserModel.find({}).sort({ online: -1 }).exec();
+      const topPosition = allUsers.findIndex((u) => u.discordID === user.id) + 1;
 
-    const embed = constructEmbed({
-      title: `${user.username}'s Profile`,
-      description: `Here are the stats for ${user.username}`,
-      fields: [
-        {
-          name: 'Баланс',
-          value: `${userProfile.coins} LOLZ`,
-          inline: true,
-        },
-        {
-          name: 'Уровень',
-          value: `${userProfile.level}`,
-          inline: true,
-        },
-        {
-          name: 'Опыт',
-          value: `${userProfile.xp} / ${maxXP} XP (${progress}%)`,
-          inline: false,
-        },
-        {
-          name: 'Бонус к монетам',
-          value: `x${coinBonus.toFixed(1)} за минуту в войсе`,
-          inline: true,
-        },
-        {
-          name: 'Время в войсе',
-          value: formatTime(userProfile.online),
-          inline: true,
+      // Canvas dimensions (half of original for faster rendering)
+      const width = 960;
+      const height = 472;
+
+      // Регистрируем шрифт
+      GlobalFonts.registerFromPath(join(__dirname, '../etc/arial.ttf'), 'Arial');
+
+      const canvas = createCanvas(width, height);
+      const ctx = canvas.getContext('2d');
+
+      // Загружаем фон
+      try {
+        const background = await readFile(join(__dirname, '../etc/profile.png'));
+        const backgroundImage = await loadImage(background);
+        ctx.drawImage(backgroundImage, 0, 0, width, height);
+      } catch (bgError) {
+        console.error('Background load error:', bgError);
+        // Черный фон если фон не загрузился
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      try {
+        const avatar = await loadImage(avatarURL);
+        const avatarSize = 130;
+        const avatarX = 480;
+        const avatarY = 78;
+        
+        // Создаем круглую маску для аватарки
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(avatarX, avatarY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.clip();
+        
+        ctx.drawImage(avatar, avatarX - avatarSize / 2, avatarY, avatarSize, avatarSize);
+        ctx.restore();
+      } catch (avatarError) {
+        console.error('Avatar load error:', avatarError);
+      }
+
+      // Рисуем аватарку партнёра или текст "не в отношениях"
+      if (partnerUser) {
+        try {
+          const partnerAvatarURL = partnerUser.displayAvatarURL({ extension: 'png', size: 256 });
+          const partnerAvatar = await loadImage(partnerAvatarURL);
+          const partnerAvatarSize = 80;
+          const partnerAvatarX = 152;
+          const partnerAvatarY = 103;
+          
+          // Создаем круглую маску для аватарки партнёра
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(partnerAvatarX, partnerAvatarY + partnerAvatarSize / 2, partnerAvatarSize / 2, 0, Math.PI * 2, true);
+          ctx.closePath();
+          ctx.clip();
+          
+          ctx.drawImage(partnerAvatar, partnerAvatarX - partnerAvatarSize / 2, partnerAvatarY, partnerAvatarSize, partnerAvatarSize);
+          ctx.restore();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '20px Arial';
+          ctx.textAlign = 'left';
+          const displayName = partnerUser.username.length > 10 
+            ? partnerUser.username.substring(0, 9) + '...' 
+            : partnerUser.username;
+          ctx.fillText(displayName, 215, 140);
+        } catch (partnerAvatarError) {
+          logger.error('Partner avatar load error:', partnerAvatarError);
         }
-      ],
-      customType: 'info',
-    });
+      } else {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '20px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText('Пары нет', 215, 140);
+      }
 
-    const profileOptions = new ActionRowBuilder<ButtonBuilder>();
-    if (userProfile.discordID === interaction.user.id) {
-      profileOptions.addComponents(
-        new ButtonBuilder()
-          .setCustomId('profile-inventory')
-          .setLabel('Инвентарь')
-          .setStyle(ButtonStyle.Secondary),
-      );
-    }
+      // Клан
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '20px Arial';
+      ctx.textAlign = 'left';
+      ctx.fillText('Клана нет', 740, 140);
 
-    await interaction.reply({
-      embeds: [embed],
-      components: userProfile.discordID === interaction.user.id ? [profileOptions] : [],
-    });
-  }
-}
+      // Уровень
+      ctx.font = 'bold 28px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${userProfile.level}`, 275, 340);
+      
+      // Топ
+      ctx.font = 'bold 26px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${topPosition}`, 685, 340);
 
-class ViewInventory implements IFeature<ButtonInteraction> {
-  name = 'profile-inventory';
+      // Юзернейм
+      ctx.font = 'bold 32px Arial';
+      ctx.textAlign = 'center';
+      const displayUsername = user.username.length > 12 
+        ? user.username.substring(0, 12) + '...' 
+        : user.username;
+      ctx.fillText(displayUsername, 485, 250);
 
-  async run({ interaction }: RunFeatureParams<ButtonInteraction>) {
-    let userProfile = await UserModel.findOne({
-      discordID: interaction.user.id,
-    }).populate('inventory');
-    if (!userProfile) {
-      userProfile = await UserModel.create({
-        discordID: interaction.user.id,
-        level: 1,
+      ctx.fillStyle = '#7b78ff';
+
+      // Баланс
+      ctx.font = 'bold 20px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${userProfile.coins}`, 480, 326);
+
+      // Сообщений
+      ctx.font = 'bold 20px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${userProfile.message}`, 480, 368);
+
+      // Онлайн
+      const hours = Math.floor(userProfile.online / (60 * 60 * 1000));
+      const minutes = Math.floor((userProfile.online % (60 * 60 * 1000)) / (60 * 1000));
+      
+      ctx.font = 'bold 20px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${hours}ч ${minutes}м`, 480, 406);
+
+      const canvasBuffer = await canvas.encode('png');
+      
+      const attachment = new AttachmentBuilder(canvasBuffer, {
+        name: 'profile.png',
       });
-      await userProfile.save();
-    }
-    if (userProfile!.inventory.length === 0) {
-      await interaction.reply({
-        ephemeral: true,
-        embeds: [
-          constructEmbed({
-            title: 'Инвентарь',
-            description: 'Ваш инвентарь пуст.',
-            customType: 'info',
-          }),
-        ],
+
+      await interaction.editReply({
+        files: [attachment],
       });
-      return;
+    } catch (error) {
+      console.error('Error generating profile canvas:', error);
+      await interaction.editReply({
+        content: 'Произошла ошибка при генерации профиля.',
+      });
     }
-    const { inventory } = await userProfile.populate<{
-      inventory: (UserInventoryItem & {
-        item: Item;
-      })[];
-    }>({
-      path: 'inventory',
-      populate: {
-        path: 'item',
-      },
-    });
-
-    const inventoryItems = inventory
-      .map((item) => `${item.item.name} - Количество: ${item.quantity}`)
-      .join('\n');
-
-    const embed = constructEmbed({
-      title: 'Ваш инвентарь',
-      description: inventoryItems,
-      customType: 'info',
-    });
-    await interaction.reply({
-      embeds: [embed],
-      ephemeral: true,
-    });
   }
 }

@@ -30,6 +30,9 @@
       "path": "./apps/ticket-bot"
     },
     {
+      "path": "./apps/backup-bot"
+    },
+    {
       "path": "./libs/shared"
     }
   ]

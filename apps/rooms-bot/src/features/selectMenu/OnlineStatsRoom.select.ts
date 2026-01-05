@@ -126,7 +126,7 @@ export class SelectOnlineStatsRoom implements IFeature<SelectMenuInteraction> {
     const embed = constructEmbed({
       title: `Статистика онлайн - ${room.name || 'Комната'}`,
       description: description,
-      customType: 'info',
+      customType: 'custom',
       footer: { text: `Страница ${page + 1} из ${totalPages}` },
       timestamp: new Date().toISOString(),
     });

@@ -58,7 +58,7 @@ export default class Duel implements ICommand {
       title: `Дуэль от ${interaction.user.username}`,
       thumbnail: { url: interaction.user.displayAvatarURL({ size: 512, forceStatic: false }) },
       footer: { text: 'У вас есть минута на принятие дуэли.' },
-      customType: 'info',
+      customType: 'custom',
     });
 
     const acceptButton = new ButtonBuilder()
@@ -174,7 +174,7 @@ class AcceptDuel implements IFeature<ButtonInteraction> {
         constructEmbed({
           title: '⚔️ Дуэль началась!',
           description: `**${challengerUser.username}** vs **${interaction.user.username}**\n\nСтавка: **${bet}** LOLZ\n\n⚡ Идет сражение...`,
-          customType: 'info',
+          customType: 'custom',
         }),
       ],
       components: [],
