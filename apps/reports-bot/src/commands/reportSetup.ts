@@ -39,10 +39,12 @@ export default class ReportSetupCommand implements ICommand {
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(button);
 
-    await interaction.channel?.send({
-      embeds: [embed],
-      components: [row],
-    });
+    if (interaction.channel && 'send' in interaction.channel) {
+      await interaction.channel.send({
+        embeds: [embed],
+        components: [row],
+      });
+    }
 
     await interaction.reply({
       content: '✅ Эмбед с кнопкой жалобы отправлен!',
