@@ -14,7 +14,13 @@ export class ClanMember {
   userID!: string;
 
   @Prop({ default: 0 })
-  online!: number;  
+  online!: number;
+
+  @Prop({ default: 0 })
+  voiceTime!: number;
+  
+  @Prop({ default: 'member' }) // 'owner', 'co-owner', 'member'
+  role!: string;
 }
 
 @index({ owner: 1 }, { unique: false })
@@ -42,6 +48,27 @@ export class Clan extends TimeStamps implements Base {
 
   @Prop()
   avatarURL?: string;
+  
+  @Prop()
+  description?: string;
+  
+  @Prop({ type: () => [String], default: [] })
+  coOwners!: string[];
+
+  @Prop()
+  lastEmbedSentAt?: Date;
+
+  @Prop()
+  categoryId?: string;
+
+  @Prop()
+  textChannelId?: string;
+
+  @Prop()
+  generalVoiceChannelId?: string;
+
+  @Prop()
+  createVoiceChannelId?: string;
 }
 
 export const ClanModel = getModelForClass(Clan, {

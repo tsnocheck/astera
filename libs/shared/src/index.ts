@@ -11,6 +11,8 @@ export * from './lib/services/construct-embed';
 export * from './lib/services/formatTime';
 export * from './lib/services/levelSystem';
 
+export * from './lib/utils/resetSelectMenu';
+
 export * from './lib/models/User';
 export * from './lib/models/Punishments';
 export * from './lib/models/Config';
@@ -24,3 +26,8 @@ export * from './lib/models/Marry';
 export * from './lib/models/BackupConfig';
 export * from './lib/models/BackupLog';
 export * from './lib/models/BackupMapping';
+export * from './lib/models/Clan';
+export * from './lib/models/ClanPrivateRoom';
+export * from './lib/models/Guild';
+export * from './lib/models/SupUser';
+export * from './lib/models/PrimeTime';

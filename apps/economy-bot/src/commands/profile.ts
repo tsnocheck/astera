@@ -3,6 +3,7 @@ import {
   RunCommandParams,
   UserModel,
   MarryModel,
+  ClanModel,
   logger,
 } from '@lolz-bots/shared';
 import {
@@ -59,6 +60,9 @@ export default class Profile implements ICommand {
         console.error('Failed to fetch partner user:', error);
       }
     }
+
+    // Проверяем наличие клана
+    const clan = await ClanModel.findOne({ 'users.userID': user.id });
     
     try {
       // Получаем топ по онлайну
@@ -143,10 +147,42 @@ export default class Profile implements ICommand {
       }
 
       // Клан
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '20px Arial';
-      ctx.textAlign = 'left';
-      ctx.fillText('Клана нет', 740, 140);
+      if (clan) {
+        // Рисуем аватарку клана если есть
+        if (clan.avatarURL) {
+          try {
+            const clanAvatar = await loadImage(clan.avatarURL);
+            const clanAvatarSize = 80;
+            const clanAvatarX = 678;
+            const clanAvatarY = 103;
+            
+            // Создаем круглую маску для аватарки клана
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(clanAvatarX, clanAvatarY + clanAvatarSize / 2, clanAvatarSize / 2, 0, Math.PI * 2, true);
+            ctx.closePath();
+            ctx.clip();
+            
+            ctx.drawImage(clanAvatar, clanAvatarX - clanAvatarSize / 2, clanAvatarY, clanAvatarSize, clanAvatarSize);
+            ctx.restore();
+          } catch (clanAvatarError) {
+            logger.error('Clan avatar load error:', clanAvatarError);
+          }
+        }
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '20px Arial';
+        ctx.textAlign = 'left';
+        const displayClanName = clan.name.length > 10 
+          ? clan.name.substring(0, 9) + '...' 
+          : clan.name;
+        ctx.fillText(displayClanName, 735, 140);
+      } else {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '20px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText('Клана нет', 740, 140);
+      }
 
       // Уровень
       ctx.font = 'bold 28px Arial';

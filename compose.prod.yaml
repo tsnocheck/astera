@@ -51,6 +51,45 @@ services:
       - bridge
     depends_on:
       - mongo
+  clan-bot:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: apps/clan-bot/Dockerfile
+    env_file:
+      - .env.clan
+    volumes:
+      - ./logs/clan-bot:/app/logs
+    networks:
+      - bridge
+    depends_on:
+      - mongo
+  utils-bot:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: apps/utils-bot/Dockerfile
+    env_file:
+      - .env.utils
+    volumes:
+      - ./logs/utils-bot:/app/logs
+    networks:
+      - bridge
+    depends_on:
+      - mongo
+  sup-bot:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: apps/sup-bot/Dockerfile
+    env_file:
+      - .env.sup
+    volumes:
+      - ./logs/sup-bot:/app/logs
+    networks:
+      - bridge
+    depends_on:
+      - mongo
   mongo:
     image: mongo:latest
     restart: unless-stopped

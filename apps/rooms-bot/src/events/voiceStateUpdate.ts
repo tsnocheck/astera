@@ -66,10 +66,13 @@ export default class VoiceStateUpdateEvent implements IEvent {
       const channel = oldState.guild.channels.cache.get(
         oldState.channel.id,
       ) as VoiceChannel;
-      if (channel && channel.members && channel.members.size === 0) {
-        await channel
-          .delete()
-          .catch((err) => logger.error('Failed to delete empty room:', err));
+      if (channel){
+        if (channel.id === createPrivateRooms) return;
+        if (channel.members && channel.members.size === 0) {
+          await channel
+            .delete()
+            .catch((err) => logger.error('Failed to delete empty room:', err));
+        }
       }
     }
 

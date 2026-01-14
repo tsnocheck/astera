@@ -33,6 +33,12 @@
       "path": "./apps/backup-bot"
     },
     {
+      "path": "./apps/utils-bot"
+    },
+    {
+      "path": "./apps/sup-bot"
+    },
+    {
       "path": "./libs/shared"
     }
   ]

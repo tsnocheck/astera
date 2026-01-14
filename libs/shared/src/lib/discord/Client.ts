@@ -19,6 +19,7 @@ class BotClient extends Client {
   preconditions: Map<string, IPrecondition>;
   registry: Registry;
   api: LolzApi;
+  tempData: Map<string, any>;
 
   constructor() {
     super({
@@ -43,6 +44,7 @@ class BotClient extends Client {
     this.preconditions = new Map<string, IPrecondition>();
     this.registry = new Registry(this);
     this.api = new LolzApi(process.env.LOLZ_API_KEY!, process.env.LOLZ_API_URL!);
+    this.tempData = new Map<string, any>();
   }
 
   public async build(token: string, rootDir: string) {
